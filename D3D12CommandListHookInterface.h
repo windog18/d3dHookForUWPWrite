@@ -120,7 +120,7 @@ DECLARE_FUNCTIONPTR(void, D3D12DrawInstanced, ID3D12GraphicsCommandList *dComman
 // 	stringstream ss;
 // 	ss << GetCurrentThreadId();
 // 	Log(ss.str() + " [d3d12] D3D12DrawInstanced");
-// 	oD3D12DrawInstanced(dCommandList, VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
+ 	oD3D12DrawInstanced(dCommandList, VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
 	RecordStart
 	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_DrawInstanced);
@@ -522,7 +522,7 @@ void CreateHookD3D12CommandListInterface(uint64_t* methodVirtualTable)
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 9]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 10]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 11]);
-	MH_EnableHook((LPVOID)methodVirtualTable[72 + 12]);
+ 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 12]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 13]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 14]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 15]);
@@ -548,8 +548,8 @@ void CreateHookD3D12CommandListInterface(uint64_t* methodVirtualTable)
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 35]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 36]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 37]);
- 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 38]); 
- 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 39]);
+	MH_EnableHook((LPVOID)methodVirtualTable[72 + 38]); 
+	MH_EnableHook((LPVOID)methodVirtualTable[72 + 39]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 40]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 41]);
 	MH_EnableHook((LPVOID)methodVirtualTable[72 + 42]);
