@@ -50,7 +50,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -143,7 +143,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FW1FontWrapper\CFW1ColorRGBA.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1ColorRGBAInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1DWriteRenderTarget.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1DWriteRenderTargetInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1Factory.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1FactoryInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1FontWrapper.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1FontWrapperInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphAtlas.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphAtlasInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphProvider.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphProviderInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphRenderStates.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphRenderStatesInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphSheet.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphSheetInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphVertexDrawer.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1GlyphVertexDrawerInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1StateSaver.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1TextGeometry.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1TextGeometryInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1TextRenderer.cpp" />
+    <ClCompile Include="FW1FontWrapper\CFW1TextRendererInterface.cpp" />
+    <ClCompile Include="FW1FontWrapper\FW1FontWrapper.cpp" />
+    <ClCompile Include="FW1FontWrapper\FW1Precompiled.cpp" />
+    <ClCompile Include="GlobalGathering.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="memstream.cpp" />
     <ClCompile Include="Minhook\src\buffer.c" />
     <ClCompile Include="Minhook\src\HDE\hde32.c" />
     <ClCompile Include="Minhook\src\HDE\hde64.c" />
@@ -152,7 +179,32 @@
     <ClCompile Include="UWP.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="D3D12CommandListHookInterface.h" />
+    <ClInclude Include="D3D12CommandQueueHookInterface.h" />
+    <ClInclude Include="D3D12DeviceHookInterface.h" />
+    <ClInclude Include="D3D12ResourceHookInterface.h" />
+    <ClInclude Include="D3D12SwapChainHookInterface.h" />
+    <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1ColorRGBA.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1DWriteRenderTarget.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1Factory.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1FontWrapper.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1GlyphAtlas.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1GlyphProvider.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1GlyphRenderStates.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1GlyphSheet.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1GlyphVertexDrawer.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1Object.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1StateSaver.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1TextGeometry.h" />
+    <ClInclude Include="FW1FontWrapper\CFW1TextRenderer.h" />
+    <ClInclude Include="FW1FontWrapper\FW1CompileSettings.h" />
+    <ClInclude Include="FW1FontWrapper\FW1FontWrapper.h" />
+    <ClInclude Include="FW1FontWrapper\FW1Precompiled.h" />
+    <ClInclude Include="GlobalGathering.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="memstream.h" />
     <ClInclude Include="Minhook\src\buffer.h" />
     <ClInclude Include="Minhook\src\HDE\hde32.h" />
     <ClInclude Include="Minhook\src\HDE\hde64.h" />
@@ -161,6 +213,7 @@
     <ClInclude Include="Minhook\src\HDE\table64.h" />
     <ClInclude Include="Minhook\src\trampoline.h" />
     <ClInclude Include="UWP.hpp" />
+    <ClInclude Include="xdefine.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="METHODSTABLE.txt" />

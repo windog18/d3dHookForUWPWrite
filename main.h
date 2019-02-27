@@ -1,67 +1,22 @@
 #include <Windows.h>
 #include <stdint.h>
 #include <dxgi.h>
+#include <dxgi1_2.h>
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
-#include "MinHook/include/MinHook.h"
+#pragma comment(lib, "d3d11.lib")
+//#include "MinHook/include/MinHook.h"
 
 #include "UWP.hpp"
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-
-#include <clocale>
-#include <locale>
-#include <string>
-#include <vector>
-
-inline std::string narrow(std::wstring const& text)
-{
-	std::locale const loc("");
-	wchar_t const* from = text.c_str();
-	std::size_t const len = text.size();
-	std::vector<char> buffer(len + 1);
-	std::use_facet<std::ctype<wchar_t> >(loc).narrow(from, from + len, '_', &buffer[0]);
-	return std::string(&buffer[0], &buffer[len]);
-}
-//=========================================================================================================================//
-
-#include <fstream>
-using namespace std;
-
-char dlldir[320];
-char *GetDirectoryFile(char *filename)
-{
-	static char path[320];
-	strcpy_s(path, dlldir);
-	strcat_s(path, filename);
-	return path;
-}
-
-const std::wstring DumpPath = fs::path(UWP::Current::Storage::GetTemporaryPath()) / L"DUMP" / L"log_hello_2019_syl.txt";
-void Log(const char *fmt, ...)
-{
-	if (!fmt)	return;
-	 
-
-
-	char		text[4096];
-	va_list		ap;
-	va_start(ap, fmt);
-	vsprintf_s(text, fmt, ap);
-	va_end(ap);
-	OutputDebugStringA(text);
-	return;
-	//ofstream logfile(GetDirectoryFile((PCHAR)"log.txt"), ios::app);
-	//LPCSTR str = const_cast<LPCSTR>(DumpPath.c_str());
-	//OutputDebugStringA(narrow(DumpPath).c_str());
-
-	ofstream logfile(narrow(DumpPath), ios::app);
- 	if (logfile.is_open() && text)	logfile << text << endl;
- 	logfile.close();
-}
-
-//=========================================================================================================================//
-
+#include "d3dx12.h"
+// #include <experimental/filesystem>
+// namespace fs = std::experimental::filesystem;
+// 
+// #include <clocale>
+// #include <locale>
+// #include <string>
+// #include <vector>
+#include "Common.h"
 
 namespace dx12
 {
@@ -213,6 +168,19 @@ dx12::Status::Enum dx12::init(RenderType::Enum _renderType)
 					return Status::UnknownError;
 				}
 
+				ID3D12Resource *d3dResources;
+				if (device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+					D3D12_HEAP_FLAG_NONE,
+					&CD3DX12_RESOURCE_DESC::Buffer(1),
+					D3D12_RESOURCE_STATE_GENERIC_READ,
+					nullptr,
+					IID_PPV_ARGS(&d3dResources)) < 0)
+				{
+					::DestroyWindow(window);
+					::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+					return Status::UnknownError;
+				}
+
 				DXGI_RATIONAL refreshRate;
 				refreshRate.Numerator = 60;
 				refreshRate.Denominator = 1;
@@ -248,23 +216,28 @@ dx12::Status::Enum dx12::init(RenderType::Enum _renderType)
 				}
 
 #if _M_X64
-				g_methodsTable = (uint64_t*)::calloc(150, sizeof(uint64_t));
+				g_methodsTable = (uint64_t*)::calloc(44 + 19 + 9 + 60 + 18 + 15, sizeof(uint64_t));
 				memcpy(g_methodsTable, *(uint64_t**)device, 44 * sizeof(uint64_t));
 				memcpy(g_methodsTable + 44, *(uint64_t**)commandQueue, 19 * sizeof(uint64_t));
 				memcpy(g_methodsTable + 44 + 19, *(uint64_t**)commandAllocator, 9 * sizeof(uint64_t));
 				memcpy(g_methodsTable + 44 + 19 + 9, *(uint64_t**)commandList, 60 * sizeof(uint64_t));
 				memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint64_t**)swapChain, 18 * sizeof(uint64_t));
+				memcpy(g_methodsTable + 44 + 19 + 9 + 60 + 18, *(uint64_t**)d3dResources, 15 * sizeof(uint64_t));
 #elif defined _M_IX86
-				g_methodsTable = (uint32_t*)::calloc(150, sizeof(uint32_t));
+				g_methodsTable = (uint32_t*)::calloc(44 + 19 + 9 + 60 + 18 + 15, sizeof(uint32_t));
 				memcpy(g_methodsTable, *(uint32_t**)device, 44 * sizeof(uint32_t));
 				memcpy(g_methodsTable + 44, *(uint32_t**)commandQueue, 19 * sizeof(uint32_t));
 				memcpy(g_methodsTable + 44 + 19, *(uint32_t**)commandAllocator, 9 * sizeof(uint32_t));
 				memcpy(g_methodsTable + 44 + 19 + 9, *(uint32_t**)commandList, 60 * sizeof(uint32_t));
 				memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint32_t**)swapChain, 18 * sizeof(uint32_t));
+				memcpy(g_methodsTable + 44 + 19 + 9 + 60 + 18, *(uint32_t**)d3dResources, 15 * sizeof(uint32_t));
 #endif
 
 				device->Release();
 				device = NULL;
+
+				d3dResources->Release();
+				d3dResources = NULL;
 
 				commandQueue->Release();
 				commandQueue = NULL;

@@ -4,22 +4,21 @@
 
 #include "main.h"
 #include <sstream>
+#include "D3D12ResourceHookInterface.h"
+#include "D3D12CommandListHookInterface.h"
+#include "D3D12DeviceHookInterface.h"
+#include <d3d11.h>
+#include "./FW1FontWrapper/FW1FontWrapper.h"
 
-
-
-#define DECLARE_FUNCTIONPTR(DReturnType,DFunctionName,...) \
-typedef DReturnType(__stdcall* DFunctionName)(__VA_ARGS__);\
-DFunctionName o##DFunctionName = NULL; \
-DReturnType __stdcall hk##DFunctionName(__VA_ARGS__) \
-
-
+bool g_beginRecord = false;
+bool g_record = false;
 //=========================================================================================================================// D3D12 HOOKS 
 // D3D12 HOOKS Example
 
 bool InitOnce = true;
 bool InitOnce2 = true;
 bool InitOnce3 = true;
-
+void HookWindowProc(HWND hWnd);
 ID3D12Device *dDevice = NULL;
 ID3D12GraphicsCommandList *gDCommandList = NULL;
 
@@ -33,26 +32,26 @@ Present12 oPresent12 = NULL;
 /////////////////////////commandlist interface
 
 
-typedef void(__stdcall *D3D12DrawInstanced)(ID3D12GraphicsCommandList *dCommandList, UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation);
-D3D12DrawInstanced oD3D12DrawInstanced = NULL;
-
-typedef void(__stdcall *D3D12DrawIndexedInstanced)(ID3D12GraphicsCommandList *dCommandList, UINT IndexCount, UINT InstanceCount, UINT StartIndex, INT BaseVertex);
-D3D12DrawIndexedInstanced oD3D12DrawIndexedInstanced = NULL;
-
-typedef long(__stdcall* D3D12Dispatch)(ID3D12GraphicsCommandList *dCommandList, UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
-D3D12Dispatch oD3D12Dispatch = NULL;
-
-typedef void(__stdcall* D3D12CopyBufferRegion)(ID3D12GraphicsCommandList *dCommandList, ID3D12Resource *pDstBuffer, UINT64 DstOffset, ID3D12Resource *pSrcBuffer, UINT64 SrcOffset, UINT64 NumBytes);
-D3D12CopyBufferRegion oD3D12CopyBufferRegion = NULL;
-
-typedef void(__stdcall* D3D12CopyTextureRegion)(ID3D12GraphicsCommandList *dCommandList, 
-	const D3D12_TEXTURE_COPY_LOCATION *pDst,
-	UINT DstX, UINT DstY, UINT DstZ,
-	const D3D12_TEXTURE_COPY_LOCATION *pSrc);
-D3D12CopyTextureRegion oD3D12CopyTextureRegion = NULL;
-
-typedef void(__stdcall* D3D12CopyResource)(ID3D12GraphicsCommandList *dCommandList, ID3D12Resource *pDstResource, ID3D12Resource *pSrcResource);
-D3D12CopyResource oD3D12CopyResource = NULL;
+// typedef void(__stdcall *D3D12DrawInstanced)(ID3D12GraphicsCommandList *dCommandList, UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation);
+// D3D12DrawInstanced oD3D12DrawInstanced = NULL;
+// 
+// typedef void(__stdcall *D3D12DrawIndexedInstanced)(ID3D12GraphicsCommandList *dCommandList, UINT IndexCount, UINT InstanceCount, UINT StartIndex, INT BaseVertex);
+// D3D12DrawIndexedInstanced oD3D12DrawIndexedInstanced = NULL;
+// 
+// typedef long(__stdcall* D3D12Dispatch)(ID3D12GraphicsCommandList *dCommandList, UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
+// D3D12Dispatch oD3D12Dispatch = NULL;
+// 
+// typedef void(__stdcall* D3D12CopyBufferRegion)(ID3D12GraphicsCommandList *dCommandList, ID3D12Resource *pDstBuffer, UINT64 DstOffset, ID3D12Resource *pSrcBuffer, UINT64 SrcOffset, UINT64 NumBytes);
+// D3D12CopyBufferRegion oD3D12CopyBufferRegion = NULL;
+// 
+// typedef void(__stdcall* D3D12CopyTextureRegion)(ID3D12GraphicsCommandList *dCommandList, 
+// 	const D3D12_TEXTURE_COPY_LOCATION *pDst,
+// 	UINT DstX, UINT DstY, UINT DstZ,
+// 	const D3D12_TEXTURE_COPY_LOCATION *pSrc, const D3D12_BOX *pSrcBox);
+// D3D12CopyTextureRegion oD3D12CopyTextureRegion = NULL;
+// 
+// typedef void(__stdcall* D3D12CopyResource)(ID3D12GraphicsCommandList *dCommandList, ID3D12Resource *pDstResource, ID3D12Resource *pSrcResource);
+// D3D12CopyResource oD3D12CopyResource = NULL;
 
 // typedef void(__stdcall* D3D12CopyTiles)(ID3D12GraphicsCommandList *dCommandList, 
 // 	                                    ID3D12Resource *pTiledResource, 
@@ -73,46 +72,15 @@ D3D12QueryInterface oD3D12QueryInterface = NULL;
 
 DECLARE_FUNCTIONPTR(void, D3D12ExecuteCommandLists, ID3D12CommandQueue * dCommandQueue, UINT NumCommandLists, ID3D12CommandList *const *ppCommandLists)
 {
-	Log("[d3d12] D3D12ExecuteCommandLists");
+	
+	//Log("[d3d12] D3D12ExecuteCommandLists");
 	return oD3D12ExecuteCommandLists(dCommandQueue, NumCommandLists, ppCommandLists);
 }
 
 
-
-//////////////////////////////////////////////////////////device interface
-DECLARE_FUNCTIONPTR(long, D3D12DeviceQueryInterface, ID3D12Device* dDevice, REFIID riid, void **ppvObject) //0
-{
-	Log("[d3d12] create D3D12DeviceQueryInterface");
-	return oD3D12DeviceQueryInterface(dDevice, riid, ppvObject);
-}
-
-DECLARE_FUNCTIONPTR(long, D3D12DeviceCreateCommandQueue, ID3D12Device *dDevice, const D3D12_COMMAND_QUEUE_DESC *pDesc, REFIID riid, void **ppCommandQueue) //8
-{
-	Log("[d3d12] create D3D12DeviceCreateCommandQueue");
-	return oD3D12DeviceCreateCommandQueue(dDevice, pDesc, riid, ppCommandQueue);
-}
-
-DECLARE_FUNCTIONPTR(long, D3D12CreateCommandAllocator, ID3D12Device *dDevice, D3D12_COMMAND_LIST_TYPE type, REFIID riid, void **ppCommandAllocator) //9
-{
-	Log("[d3d12] create D3D12CreateCommandAllocator");
-	return oD3D12CreateCommandAllocator(dDevice, type, riid, ppCommandAllocator);
-}
-
-DECLARE_FUNCTIONPTR(long, D3D12CreateCommittedResource, ID3D12Device * dDevice,
-const D3D12_HEAP_PROPERTIES *pHeapProperties,
-D3D12_HEAP_FLAGS HeapFlags,
-const D3D12_RESOURCE_DESC *pDesc,
-D3D12_RESOURCE_STATES InitialResourceState,
-const D3D12_CLEAR_VALUE *pOptimizedClearValue,
-REFIID riidResource,
-void **ppvResource)
-{
-	Log("[d3d12] create D3D12CreateCommittedResource");
-	return oD3D12CreateCommittedResource(dDevice, pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, riidResource, ppvResource);
-}
-
 long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
+	//Log_WithThreadID("[d3d12]present be called");
 	if (InitOnce)
 	{
 		
@@ -122,7 +90,109 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D12Device), (void **)&dDevice)))
 		{
 			pSwapChain->GetDevice(__uuidof(dDevice), (void**)&dDevice);
+// 			ID3D12CommandQueue* commandQueue;
+// 			ID3D12CommandAllocator* commandAllocator;
+// 			ID3D12GraphicsCommandList* commandList;
+
+
+// 			D3D12_COMMAND_QUEUE_DESC queueDesc;
+// 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+// 			queueDesc.Priority = 0;
+// 			queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+// 			queueDesc.NodeMask = 0;
+// 			dDevice->CreateCommandQueue(&queueDesc, __uuidof(ID3D12CommandQueue), (void**)&commandQueue);
+// 			dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&commandAllocator);
+// 			dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&commandList);
+// 
+// 			UINT d3d11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+// 			//d3d11DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+// 			
+// 			////createD3D11Device;
+// 			ID3D11Device *d3d11Device;
+// 			ID3D11DeviceContext *d3d11DeviceContext;
+// 			D3D11On12CreateDevice(dDevice, d3d11DeviceFlags, nullptr,  0, reinterpret_cast<IUnknown**>(&commandQueue), 1, 0, &d3d11Device, &d3d11DeviceContext, nullptr);
+// 
+// 			GlobalGathering::GetInstance()->m_drawD3D11Device = d3d11Device;
+// 			GlobalGathering::GetInstance()->m_drawD3D11DeviceContext = d3d11DeviceContext;
+// 
+// 
+// 			static ID3D12Resource *d3d12Resource;
+// 			static ID3D12DescriptorHeap *rtvHeap;
+// 			D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+// 			rtvHeapDesc.NumDescriptors = 1;
+// 			rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+// 			rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+// 			dDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&rtvHeap));
+// 			CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(rtvHeap->GetCPUDescriptorHandleForHeapStart());
+// 			pSwapChain->GetBuffer(0, IID_PPV_ARGS(&d3d12Resource));
+// 			dDevice->CreateRenderTargetView(d3d12Resource, NULL, rtvHandle);
+// 			d3d12Resource->Release();
+// 			rtvHeap->Release();
+
+			DXGI_SWAP_CHAIN_DESC sd;
+			
+			if (pSwapChain->GetDesc(&sd) == S_OK) {
+				stringstream ss;
+				ss << sd.BufferCount;
+				Log(ss.str().c_str());
+				ss << sd.Flags;
+				Log(ss.str().c_str());
+				ss << sd.Windowed;
+				Log(ss.str().c_str());
+			}
+			HookWindowProc(sd.OutputWindow);
 		}
+		
+
+
+	}
+	
+	
+	if (g_beginRecord || g_record) {
+		if (g_record) {
+			GlobalGathering::GetInstance()->WriteAllBufferToResult();
+		}
+		ToggleRecordState();
+	}
+
+	
+	
+
+
+	//Log_WithThreadID("[d3d12] hkPresent12");
+
+	if (GlobalGathering::GetInstance()->m_drawD3D11Device != NULL) {
+		//Log("Begin to draw debug string");
+		static IFW1Factory *pFW1Factory = nullptr;
+		static HRESULT hResult;
+		if (!pFW1Factory)
+			hResult = FW1CreateFactory(FW1_VERSION, &pFW1Factory);
+
+		static IFW1FontWrapper *pFontWrapper = nullptr;
+		if (!pFontWrapper) {
+			hResult = pFW1Factory->CreateFontWrapper(GlobalGathering::GetInstance()->m_drawD3D11Device, L"Arial", &pFontWrapper);
+			if (pFontWrapper != NULL) {
+				Log("font wrapped create sccuessed!");
+			}
+		}
+	
+			
+		static auto x = 1280.0f;
+
+		//
+		// Very crude marquee mechanism for demonstration
+		// 
+		if (x <= -1280.0f)x = 1280.0f;
+
+		pFontWrapper->DrawString(
+			GlobalGathering::GetInstance()->m_drawD3D11DeviceContext,
+			L"Injected via Indicium-Supra by Nefarius",// String
+			50.0f,// Font size
+			x--,// X position
+			30.0f,// Y position
+			0xff0099ff,// Text color, 0xAaBbGgRr
+			FW1_RESTORESTATE// Flags (for example FW1_RESTORESTATE to keep context states unchanged)
+		);
 	}
 	//Log("[d3d12]Present called");
 	
@@ -145,131 +215,240 @@ long __stdcall hkD3D12QueryInterface(ID3D12CommandQueue * dCommandQueue, REFIID 
 
 //=========================================================================================================================commandlist hook interface//
 
-void __stdcall hkD3D12DrawInstanced(ID3D12GraphicsCommandList *dCommandList, UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation)
-{
-	if (InitOnce2)
-	{
-
-		InitOnce2 = false;
-		std::string outputStr;
-		std::stringstream  ss;
-		ss << VertexCountPerInstance;
-		ss >> outputStr;
-		//OutputDebugStringA(outputStr.c_str());
-		Log(outputStr.c_str());
-	}
-
-
-	//no fog/smoke/glow test (elemental-demo-dx12)
-// 	const float f[4] = { 0, 0, 0, 0 };
-// 	dCommandList->OMSetBlendFactor(f);
-
-	return oD3D12DrawInstanced(dCommandList, VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
-}
-
-void __stdcall hkD3D12DrawIndexedInstanced(ID3D12GraphicsCommandList *dCommandList, UINT IndexCount, UINT InstanceCount, UINT StartIndex, INT BaseVertex)
-{
-	if (InitOnce3)
-	{
-		InitOnce3 = false;
-		Log("[d3d12]DrawIndexedInstanced called");
-	}
-
-
-	//no fog/smoke/glow test (elemental-demo-dx12)
-// 	const float f[4] = { 0, 0, 0, 0 };
-// 	dCommandList->OMSetBlendFactor(f);
-
-	return oD3D12DrawIndexedInstanced(dCommandList, IndexCount, InstanceCount, StartIndex, BaseVertex);
-}
-
-long __stdcall hkD3D12Dispatch(ID3D12GraphicsCommandList *dCommandList, UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ)
-{
-	//Log("[d3d12]Dispatch ");
-	return oD3D12Dispatch(dCommandList, ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
-}
-
-void __stdcall hkD3D12CopyBufferRegion(ID3D12GraphicsCommandList *dCommandList, ID3D12Resource *pDstBuffer, UINT64 DstOffset, ID3D12Resource *pSrcBuffer, UINT64 SrcOffset, UINT64 NumBytes)
-{
-	//Log("[d3d12]hkD3D12CopyBufferRegion ");
-	oD3D12CopyBufferRegion(dCommandList, pDstBuffer, DstOffset, pSrcBuffer, SrcOffset, NumBytes);
-}
-
-void __stdcall hkD3D12CopyTextureRegion(ID3D12GraphicsCommandList *dCommandList, 
-	                                    const D3D12_TEXTURE_COPY_LOCATION *pDst, 
-	                                    UINT DstX, UINT DstY, UINT DstZ, 
-	                                    const D3D12_TEXTURE_COPY_LOCATION *pSrc)
-{
-	//Log("[d3d12]hkD3D12CopyTextureRegion ");
-	oD3D12CopyTextureRegion(dCommandList, pDst, DstX, DstY, DstZ, pSrc);
-}
-
-void __stdcall hkD3D12CopyResource(ID3D12GraphicsCommandList *dCommandList, ID3D12Resource *pDstResource, ID3D12Resource *pSrcResource)
-{
-	//Log("[d3d12]hkD3D12CopyResource ");
-	oD3D12CopyResource(dCommandList, pDstResource, pSrcResource);
-}
-
-// void __stdcall hkD3D12CopyTiles(ID3D12GraphicsCommandList *dCommandList,
-// 	ID3D12Resource *pTiledResource,
-// 	const D3D12_TILED_RESOURCE_COORDINATE *pTileRegionStartCoordinate,
-// 	const D3D12_TILE_REGION_SIZE *pTileRegionSize,
-// 	ID3D12Resource *pBuffer,
-// 	UINT64 BufferStartOffsetInBytes,
-// 	D3D12_TILE_COPY_FLAGS Flags)
-// {
-// 	Log("[d3d12]hkD3D12CopyTiles ");
-// 	oD3D12CopyTiles(dCommandList, pTiledResource, pTileRegionStartCoordinate, pTileRegionSize, pBuffer, BufferStartOffsetInBytes, Flags);
-// }
-
 //========================================================================================================================= device hook interface//
 
 
 
 
 //=========================================================================================================================//
+typedef LRESULT(__stdcall* WINPROC) (_In_ HWND hWnd,
+	_In_ UINT Msg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+WINPROC OriginalDefWindowProc = nullptr;
+WINPROC OriginalWindowProc = nullptr;
+
+
+LRESULT WINAPI DetourDefWindowProc(
+	_In_ HWND hWnd,
+	_In_ UINT Msg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam
+)
+{
+// 	static std::once_flag flag;
+// 	std::call_once(flag, []() {Logger::get("DetourDefWindowProc").information("++ DetourDefWindowProc called"); });
+// 
+ 	ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
+
+	return OriginalDefWindowProc(hWnd, Msg, wParam, lParam);
+}
+
+LRESULT WINAPI DetourWindowProc(
+	_In_ HWND hWnd,
+	_In_ UINT Msg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam
+)
+{
+// 	static std::once_flag flag;
+// 	std::call_once(flag, []() {Logger::get("DetourWindowProc").information("++ DetourWindowProc called"); });
+// 
+ 	ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
+
+	return OriginalWindowProc(hWnd, Msg, wParam, lParam);
+}
+
+
+ LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+// 	 if (msg != 132 && msg != 32 && msg != 675) {
+// 		 stringstream ss;
+// 		 ss << msg;
+// 		 std::string outputString = "procHandler be called " + ss.str();
+// 		 Log(outputString.c_str());
+// 	 }
+
+	 if (msg == 77) { //F1
+		 BeginRecord();
+	 }
+
+	 switch (msg)
+	 {
+	 case WM_KEYDOWN:
+	 case WM_SYSKEYDOWN:
+	 case WM_LBUTTONDOWN:
+	 case WM_RBUTTONDOWN:
+	 case WM_MBUTTONDOWN:
+	 case WM_LBUTTONDBLCLK:
+	 case WM_RBUTTONDBLCLK:
+	 case WM_MBUTTONDBLCLK:
+		 Log("windows key pressed! -- 2019-SYL");
+		 break;
+	 default:
+		 break;
+	 }
+	 
+	 return 0;
+// 	 if (ImGui::GetCurrentContext() == NULL)
+// 		 return 0;
+// 
+// 	ImGuiIO& io = ImGui::GetIO();
+// 	switch (msg)
+// 	{
+// 	case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
+// 	case WM_RBUTTONDOWN: case WM_RBUTTONDBLCLK:
+// 	case WM_MBUTTONDOWN: case WM_MBUTTONDBLCLK:
+// 	{
+// 		int button = 0;
+// 		if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK) button = 0;
+// 		if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK) button = 1;
+// 		if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONDBLCLK) button = 2;
+// 		if (!ImGui::IsAnyMouseDown() && ::GetCapture() == NULL)
+// 			::SetCapture(hwnd);
+// 		io.MouseDown[button] = true;
+// 		return 0;
+// 	}
+// 	case WM_LBUTTONUP:
+// 	case WM_RBUTTONUP:
+// 	case WM_MBUTTONUP:
+// 	{
+// 		int button = 0;
+// 		if (msg == WM_LBUTTONUP) button = 0;
+// 		if (msg == WM_RBUTTONUP) button = 1;
+// 		if (msg == WM_MBUTTONUP) button = 2;
+// 		io.MouseDown[button] = false;
+// 		if (!ImGui::IsAnyMouseDown() && ::GetCapture() == hwnd)
+// 			::ReleaseCapture();
+// 		return 0;
+// 	}
+// 	case WM_MOUSEWHEEL:
+// 		io.MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +1.0f : -1.0f;
+// 		return 0;
+// 	case WM_MOUSEHWHEEL:
+// 		io.MouseWheelH += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +1.0f : -1.0f;
+// 		return 0;
+// 	case WM_MOUSEMOVE:
+// 		io.MousePos.x = (signed short)(lParam);
+// 		io.MousePos.y = (signed short)(lParam >> 16);
+// 		return 0;
+// 	case WM_KEYDOWN:
+// 	case WM_SYSKEYDOWN:
+// 		if (wParam < 256)
+// 			io.KeysDown[wParam] = 1;
+// 		return 0;
+// 	case WM_KEYUP:
+// 	case WM_SYSKEYUP:
+// 		if (wParam < 256)
+// 			io.KeysDown[wParam] = 0;
+// 		return 0;
+// 	case WM_CHAR:
+// 		// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+// 		if (wParam > 0 && wParam < 0x10000)
+// 			io.AddInputCharacter((unsigned short)wParam);
+// 		return 0;
+// 	case WM_SETCURSOR:
+// 		if (LOWORD(lParam) == HTCLIENT && ImGui_ImplWin32_UpdateMouseCursor())
+// 			return 1;
+// 		return 0;
+// 	}
+// 	return 0;
+}
+
+void HookWindowProc(HWND hWnd)
+{
+	MH_STATUS ret;
+	if ((ret = MH_CreateHook(&DefWindowProcW,&DetourDefWindowProc, reinterpret_cast<LPVOID*>(&OriginalDefWindowProc))) != MH_OK)
+	{
+		Log("Couldn't create hook for DefWindowProcW: ");
+	}
+
+	if (ret == MH_OK && MH_EnableHook(&DefWindowProcW) != MH_OK)
+	{
+		Log("Couldn't enable DefWindowProcW hook");
+	}
+
+	if ((ret = MH_CreateHook(
+		&DefWindowProcA,
+		&DetourDefWindowProc,
+		reinterpret_cast<LPVOID*>(&OriginalDefWindowProc))
+		) != MH_OK)
+	{
+		Log("Couldn't create hook for DefWindowProcA");
+		return;
+	}
+
+	if (ret == MH_OK && MH_EnableHook(&DefWindowProcA) != MH_OK)
+	{
+		Log("Couldn't enable DefWindowProcW hook");
+	}
+
+	auto lptrWndProc = reinterpret_cast<WINPROC>(GetWindowLongPtr(hWnd, GWLP_WNDPROC));
+	if (hWnd == NULL) {
+		Log("could not GetWindowLongPtr ");
+	}
+
+	if (MH_CreateHook(lptrWndProc, &DetourWindowProc, reinterpret_cast<LPVOID*>(&OriginalWindowProc)) != MH_OK)
+	{
+		Log("Couldn't create hook for GWLP_WNDPROC");
+		return;
+	}
+
+	if (MH_EnableHook(lptrWndProc) != MH_OK)
+	{
+		Log("Couldn't enable GWLP_WNDPROC hook");
+	}
+
+}
+
+HHOOK g_hHook = NULL;
+LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	Log("hooked keyboard!--------syl-2019");
+	//MessageBox(NULL, IsNumber(wParam), _T("Message"), 0);
+	return CallNextHookEx(0, nCode, wParam, lParam);
+	
+}
+HINSTANCE g_instanceID = NULL;
 
 int dx12Thread()
 {
+
 	if (dx12::init(dx12::RenderType::D3D12) == dx12::Status::Success)
 	{
-		//OutputDebugStringA("Hello 2019_2019_attach success_1");
+
 		MH_Initialize();
-		//OutputDebugStringA("Hello 2019_2019_attach success_2");
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[0], hkD3D12DeviceQueryInterface, (LPVOID*)&oD3D12DeviceQueryInterface);
+
+		CreateHookD3D12CommandListInterface(dx12::getMethodsTable());
+		CreateHookD3D12ResourceInterface(dx12::getMethodsTable());
+		
+		CreateHookD3D12DeviceInterface(dx12::getMethodsTable());
+
+		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[0], hkD3D12DeviceQueryInterface, (LPVOID*)&oD3D12DeviceQueryInterface);
 		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[8], hkD3D12DeviceCreateCommandQueue, (LPVOID*)&oD3D12DeviceCreateCommandQueue);
 		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[9], hkD3D12CreateCommandAllocator, (LPVOID*)&oD3D12CreateCommandAllocator);
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[27], hkD3D12CreateCommittedResource, (LPVOID*)&oD3D12CreateCommittedResource);
+		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[27], hkD3D12CreateCommittedResource, (LPVOID*)&oD3D12CreateCommittedResource);
 
 		MH_CreateHook((LPVOID)dx12::getMethodsTable()[140], hkPresent12, (LPVOID*)&oPresent12);
 
 		MH_CreateHook((LPVOID)dx12::getMethodsTable()[44], hkD3D12QueryInterface, (LPVOID*)&oD3D12QueryInterface);
 		MH_CreateHook((LPVOID)dx12::getMethodsTable()[44+10], hkD3D12ExecuteCommandLists, (LPVOID*)&oD3D12ExecuteCommandLists);
 
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[84], hkD3D12DrawInstanced, (LPVOID*)&oD3D12DrawInstanced);
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[85], hkD3D12DrawIndexedInstanced, (LPVOID*)&oD3D12DrawIndexedInstanced);
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[86], hkD3D12Dispatch, (LPVOID*)&oD3D12Dispatch);
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[87], hkD3D12CopyBufferRegion, (LPVOID*)&oD3D12CopyBufferRegion);
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[88], hkD3D12CopyTextureRegion, (LPVOID*)&oD3D12CopyTextureRegion);
-		MH_CreateHook((LPVOID)dx12::getMethodsTable()[89], hkD3D12CopyResource, (LPVOID*)&oD3D12CopyResource);
 
 
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[0]);
+		//MH_EnableHook((LPVOID)dx12::getMethodsTable()[0]);
 		//MH_EnableHook((LPVOID)dx12::getMethodsTable()[8]);
 		//MH_EnableHook((LPVOID)dx12::getMethodsTable()[9]);
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[27]);
+		//MH_EnableHook((LPVOID)dx12::getMethodsTable()[27]);
+
 
 		MH_EnableHook((LPVOID)dx12::getMethodsTable()[140]);
 
 		MH_EnableHook((LPVOID)dx12::getMethodsTable()[44]);
 		MH_EnableHook((LPVOID)dx12::getMethodsTable()[44 + 10]);
 
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[84]);
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[85]);
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[86]);
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[87]);
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[88]);
-		MH_EnableHook((LPVOID)dx12::getMethodsTable()[89]);
 	}
 
 	return 0;
@@ -280,11 +459,13 @@ int dx12Thread()
 
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, LPVOID)
 {
+	char dlldir[320];
 	DisableThreadLibraryCalls(hInstance);
 
 	switch (fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
+		//SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)KeyboardProc, hInstance, 0);
 		const fs::path WritePath = DumpPath;
 		std::error_code ErrorCode;
 		if (fs::create_directories(WritePath.parent_path(), ErrorCode) == false && ErrorCode)
@@ -299,6 +480,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, LPVOID)
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)dx12Thread, NULL, 0, NULL);
 		break;
 	}
-
+	g_instanceID = hInstance;
 	return TRUE;
 }
