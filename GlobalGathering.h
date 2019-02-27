@@ -55,6 +55,9 @@ public:
 	
 	
 	MemStream *GetOrCreateMemStream(DWORD threadID);
+	MemStream *GetOrCreateMemStreamForPtr(void *ptr);
+
+
 	void WriteAllBufferToResult();
 	void ResetRecordState();
 
@@ -76,6 +79,7 @@ private:
 
 
 	std::map<DWORD, MemStream *> m_sRecordMemStreamMap;
+	std::map<void *, MemStream *> m_sCommandRecordMemStreamMap;
 
 	std::mutex m_sMutex;
 };

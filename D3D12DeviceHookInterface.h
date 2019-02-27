@@ -53,32 +53,38 @@
 
 //////////////////////////////////////////////////////////device interface
 DECLARE_FUNCTIONPTR(long, D3D12DeviceQueryInterface, ID3D12Device* dDevice, REFIID riid, void **ppvObject) //0
-{
-	Log("[d3d12] create D3D12DeviceQueryInterface");
-	return oD3D12DeviceQueryInterface(dDevice, riid, ppvObject);
+{ 
+	auto res = oD3D12DeviceQueryInterface(dDevice, riid, ppvObject);
+
+	LOG_ONCE(__FUNCTION__);
+
+	return res;
 }
 
 DECLARE_FUNCTIONPTR(UINT, D3D12DeviceGetNodeCount, ID3D12Device *dDevice)  //7
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12DeviceGetNodeCount(dDevice);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12DeviceCreateCommandQueue, ID3D12Device *dDevice, const D3D12_COMMAND_QUEUE_DESC *pDesc, REFIID riid, void **ppCommandQueue) //8
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
-	Log("[d3d12] create D3D12DeviceCreateCommandQueue");
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12DeviceCreateCommandQueue(dDevice, pDesc, riid, ppCommandQueue);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateCommandAllocator, ID3D12Device *dDevice, D3D12_COMMAND_LIST_TYPE type, REFIID riid, void **ppCommandAllocator) //9
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
-	Log("[d3d12] create D3D12CreateCommandAllocator");
+	//FUNC_DEFINE
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateCommandAllocator(dDevice, type, riid, ppCommandAllocator);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateGraphicsPipelineState, ID3D12Device *dDevice, const D3D12_GRAPHICS_PIPELINE_STATE_DESC *pDesc, REFIID riid, void **ppPipelineState) //10
 {
+	LOG_ONCE(__FUNCTION__);
 	if (GlobalGathering::GetInstance()->GatherDevice(dDevice) == true) {
 		const void *address = static_cast<const void*>(dDevice);
 		std::stringstream ss;
@@ -102,34 +108,37 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateGraphicsPipelineState, ID3D12Device *dDevic
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateComputePipelineState, ID3D12Device *dDevice, const D3D12_COMPUTE_PIPELINE_STATE_DESC *pDesc, REFIID riid, void **ppPipelineState) //11
 {
-	Log("[d3d12] D3D12CreateComputePipelineState");
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateComputePipelineState(dDevice, pDesc, riid, ppPipelineState);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateCommandList, ID3D12Device *dDevice, UINT nodeMask, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator *pCommandAllocator,
 ID3D12PipelineState *pInitialState, REFIID riid, void **ppCommandList) //12
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
-	Log("[d3d12] D3D12CreateCommandList");
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateCommandList(dDevice, nodeMask, type, pCommandAllocator, pInitialState, riid, ppCommandList);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CheckFeatureSupport, ID3D12Device *dDevice, D3D12_FEATURE Feature, void *pFeatureSupportData, UINT FeatureSupportDataSize) //13
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
-	//Log("[d3d12] D3D12CheckFeatureSupport");
+
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CheckFeatureSupport(dDevice, Feature, pFeatureSupportData, FeatureSupportDataSize);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateDescriptorHeap, ID3D12Device *dDevice, const D3D12_DESCRIPTOR_HEAP_DESC *pDescriptorHeapDesc, REFIID riid, void **ppvHeap) //14
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
-	LOG_ONCE("[d3d12] D3D12CreateDescriptorHeap");
+
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateDescriptorHeap(dDevice, pDescriptorHeapDesc, riid, ppvHeap);
 }
 
 DECLARE_FUNCTIONPTR(UINT, D3D12GetDescriptorHandleIncrementSize, ID3D12Device *dDevice, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeapType) //15
 {
+	LOG_ONCE(__FUNCTION__);
 	//Log("[d3d12] D3D12GetDescriptorHandleIncrementSize");
 	return oD3D12GetDescriptorHandleIncrementSize(dDevice, DescriptorHeapType);
 }
@@ -137,13 +146,14 @@ DECLARE_FUNCTIONPTR(UINT, D3D12GetDescriptorHandleIncrementSize, ID3D12Device *d
 DECLARE_FUNCTIONPTR(long, D3D12CreateRootSignature, ID3D12Device *dDevice, UINT nodeMask, const void *pBlobWithRootSignature, SIZE_T blobLengthInBytes, 
 REFIID riid, void **ppvRootSignature)                        //16
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
-	LOG_ONCE("[d3d12] D3D12CreateRootSignature");
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
+
 
 	HRESULT ert = oD3D12CreateRootSignature(dDevice, nodeMask, pBlobWithRootSignature, blobLengthInBytes, riid, ppvRootSignature);
 	RecordStart
 		MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateRootSignature);
+		streaminstance->write(Device_CreateRootSignature);
 		streaminstance->write(dDevice);
 		streaminstance->write(nodeMask);
 		streaminstance->write(blobLengthInBytes);
@@ -156,14 +166,16 @@ REFIID riid, void **ppvRootSignature)                        //16
 
 DECLARE_FUNCTIONPTR(void, D3D12CreateConstantBufferView, ID3D12Device *dDevice, const D3D12_CONSTANT_BUFFER_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //17
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	//Log("[d3d12] D3D12CreateConstantBufferView");
 	return oD3D12CreateConstantBufferView(dDevice, pDesc, DestDescriptor);
 }
 
 DECLARE_FUNCTIONPTR(void, D3D12CreateShaderResourceView, ID3D12Device *dDevice, ID3D12Resource *pResource, const D3D12_SHADER_RESOURCE_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //18
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	//Log("[d3d12] D3D12CreateShaderResourceView");
 	oD3D12CreateShaderResourceView(dDevice, pResource, pDesc, DestDescriptor);
 
@@ -184,7 +196,8 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateShaderResourceView, ID3D12Device *dDevice, 
 DECLARE_FUNCTIONPTR(void, D3D12CreateUnorderedAccessView, ID3D12Device *dDevice, ID3D12Resource *pResource, ID3D12Resource *pCounterResource,
 const D3D12_UNORDERED_ACCESS_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //19
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	//Log("[d3d12] D3D12CreateUnorderedAccessView");
 	return oD3D12CreateUnorderedAccessView(dDevice, pResource, pCounterResource, pDesc, DestDescriptor);
 }
@@ -192,20 +205,23 @@ const D3D12_UNORDERED_ACCESS_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestD
 DECLARE_FUNCTIONPTR(void, D3D12CreateRenderTargetView, ID3D12Device *dDevice, ID3D12Resource *pResource,
 const D3D12_RENDER_TARGET_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //20
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	return oD3D12CreateRenderTargetView(dDevice, pResource, pDesc, DestDescriptor);
 }
 
 DECLARE_FUNCTIONPTR(void, D3D12CreateDepthStencilView, ID3D12Device *dDevice, ID3D12Resource *pResource, 
 const D3D12_DEPTH_STENCIL_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //21
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	return oD3D12CreateDepthStencilView(dDevice, pResource, pDesc, DestDescriptor);
 	
 }
 
 DECLARE_FUNCTIONPTR(void, D3D12CreateSampler, ID3D12Device *dDevice, const D3D12_SAMPLER_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //22
 {
+	LOG_ONCE(__FUNCTION__);
 	oD3D12CreateSampler(dDevice, pDesc, DestDescriptor);
 
 	RecordStart
@@ -224,6 +240,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CopyDescriptors, ID3D12Device *dDevice, UINT NumD
 const UINT *pDestDescriptorRangeSizes, UINT NumSrcDescriptorRanges, const D3D12_CPU_DESCRIPTOR_HANDLE *pSrcDescriptorRangeStarts,
 const UINT *pSrcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeapsType) //23
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CopyDescriptors(dDevice, NumDestDescriptorRanges, pDestDescriptorRangeStarts, pDestDescriptorRangeSizes,
 		NumSrcDescriptorRanges, pSrcDescriptorRangeStarts, pSrcDescriptorRangeSizes, DescriptorHeapsType);
 }
@@ -231,17 +248,20 @@ const UINT *pSrcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeaps
 DECLARE_FUNCTIONPTR(void, D3D12CopyDescriptorsSimple, ID3D12Device *dDevice, UINT NumDescriptors, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptorRangeStart,
 D3D12_CPU_DESCRIPTOR_HANDLE SrcDescriptorRangeStart, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeapsType) //24
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CopyDescriptorsSimple(dDevice, NumDescriptors, DestDescriptorRangeStart, SrcDescriptorRangeStart, DescriptorHeapsType);
 }
 
 DECLARE_FUNCTIONPTR(D3D12_RESOURCE_ALLOCATION_INFO, D3D12GetResourceAllocationInfo, ID3D12Device *dDevice, UINT visibleMask,
 UINT numResourceDescs, const D3D12_RESOURCE_DESC *pResourceDescs) //25
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetResourceAllocationInfo(dDevice, visibleMask, numResourceDescs, pResourceDescs);
 }
 
 DECLARE_FUNCTIONPTR(D3D12_HEAP_PROPERTIES, D3D12GetCustomHeapProperties, ID3D12Device *dDevice, UINT nodeMask, D3D12_HEAP_TYPE heapType) //26
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetCustomHeapProperties(dDevice, nodeMask, heapType);
 }
 
@@ -254,7 +274,8 @@ const D3D12_CLEAR_VALUE *pOptimizedClearValue,
 REFIID riidResource,
 void **ppvResource) //27
 {
-	GlobalGathering::GetInstance()->GatherDevice(dDevice);
+	LOG_ONCE(__FUNCTION__);
+	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	//Log("[d3d12] create D3D12CreateCommittedResource");
 	ID3D12Resource* pres;
 	HRESULT result = oD3D12CreateCommittedResource(dDevice, pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, riidResource, (void**)&pres);
@@ -278,88 +299,104 @@ void **ppvResource) //27
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateHeap, ID3D12Device *dDevice, const D3D12_HEAP_DESC *pDesc, REFIID riid, void **ppvHeap) //28
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateHeap(dDevice, pDesc, riid, ppvHeap);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreatePlacedResource, ID3D12Device *dDevice, ID3D12Heap *pHeap, UINT64 HeapOffset, const D3D12_RESOURCE_DESC *pDesc,
 D3D12_RESOURCE_STATES InitialState, const D3D12_CLEAR_VALUE *pOptimizedClearValue, REFIID riid, void **ppvResource) //29
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreatePlacedResource(dDevice, pHeap, HeapOffset, pDesc, InitialState, pOptimizedClearValue, riid, ppvResource);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateReservedResource, ID3D12Device *dDevice, const D3D12_RESOURCE_DESC *pDesc, D3D12_RESOURCE_STATES InitialState,
 const D3D12_CLEAR_VALUE *pOptimizedClearValue, REFIID riid, void **ppvResource) //30
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateReservedResource(dDevice, pDesc, InitialState, pOptimizedClearValue, riid, ppvResource);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateSharedHandle, ID3D12Device *dDevice, ID3D12DeviceChild *pObject, const SECURITY_ATTRIBUTES *pAttributes,
 DWORD Access, LPCWSTR Name, HANDLE *pHandle) //31
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateSharedHandle(dDevice, pObject, pAttributes, Access, Name, pHandle);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12OpenSharedHandle, ID3D12Device *dDevice, HANDLE NTHandle, REFIID riid, void **ppvObj) //32
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12OpenSharedHandle(dDevice, NTHandle, riid, ppvObj);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12OpenSharedHandleByName, ID3D12Device *dDevice, LPCWSTR Name, DWORD Access, HANDLE *pNTHandle) //33
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12OpenSharedHandleByName(dDevice, Name, Access, pNTHandle);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12MakeResident, ID3D12Device *dDevice, UINT NumObjects, ID3D12Pageable *const *ppObjects) //34
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12MakeResident(dDevice, NumObjects, ppObjects);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12Evict, ID3D12Device *dDevice, UINT NumObjects, ID3D12Pageable *const *ppObjects) //35
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12Evict(dDevice, NumObjects, ppObjects);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateFence, ID3D12Device *dDevice, UINT64 InitialValue, D3D12_FENCE_FLAGS Flags, REFIID riid, void **ppFence) //36
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateFence(dDevice, InitialValue, Flags, riid, ppFence);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12GetDeviceRemovedReason, ID3D12Device *dDevice) //37
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetDeviceRemovedReason(dDevice);
 }
 
 DECLARE_FUNCTIONPTR(void, D3D12GetCopyableFootprints, ID3D12Device *dDevice, const D3D12_RESOURCE_DESC *pResourceDesc, UINT FirstSubresource, 
 UINT NumSubresources, UINT64 BaseOffset, D3D12_PLACED_SUBRESOURCE_FOOTPRINT *pLayouts, UINT *pNumRows, UINT64 *pRowSizeInBytes, UINT64 *pTotalBytes) //38
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetCopyableFootprints(dDevice, pResourceDesc, FirstSubresource, NumSubresources, BaseOffset, pLayouts, pNumRows, pRowSizeInBytes, pTotalBytes);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateQueryHeap, ID3D12Device *dDevice, const D3D12_QUERY_HEAP_DESC *pDesc, REFIID riid, void **ppvHeap) //39
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateQueryHeap(dDevice, pDesc, riid, ppvHeap);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12SetStablePowerState, ID3D12Device *dDevice, BOOL Enable) //40
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12SetStablePowerState(dDevice, Enable);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12CreateCommandSignature, ID3D12Device *dDevice, const D3D12_COMMAND_SIGNATURE_DESC *pDesc, ID3D12RootSignature *pRootSignature,
 REFIID riid, void **ppvCommandSignature) //41
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12CreateCommandSignature(dDevice, pDesc, pRootSignature, riid, ppvCommandSignature);
 }
 
 DECLARE_FUNCTIONPTR(void, D3D12GetResourceTiling, ID3D12Device *dDevice, ID3D12Resource *pTiledResource, UINT *pNumTilesForEntireResource, D3D12_PACKED_MIP_INFO *pPackedMipDesc,
 D3D12_TILE_SHAPE *pStandardTileShapeForNonPackedMips, UINT *pNumSubresourceTilings, UINT FirstSubresourceTilingToGet, D3D12_SUBRESOURCE_TILING *pSubresourceTilingsForNonPackedMips) //42
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetResourceTiling(dDevice, pTiledResource, pNumTilesForEntireResource, pPackedMipDesc, pStandardTileShapeForNonPackedMips,
 		pNumSubresourceTilings, FirstSubresourceTilingToGet, pSubresourceTilingsForNonPackedMips);
 }
 
 DECLARE_FUNCTIONPTR(LUID, D3D12GetAdapterLuid, ID3D12Device *dDevice) //43
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetAdapterLuid(dDevice);
 }
 
@@ -383,7 +420,30 @@ void CreateHookD3D12DeviceInterface(uint64_t* methodVirtualTable)
 	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[21], D3D12CreateDepthStencilView);
 	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[22], D3D12CreateSampler);
 	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[23], D3D12CopyDescriptors);
+
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[24], D3D12CopyDescriptorsSimple);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[25], D3D12GetResourceAllocationInfo);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[26], D3D12GetCustomHeapProperties);
 	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[27], D3D12CreateCommittedResource);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[28], D3D12CreateHeap);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[29], D3D12CreatePlacedResource);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[30], D3D12CreateReservedResource);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[31], D3D12CreateSharedHandle);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[32], D3D12OpenSharedHandle);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[33], D3D12OpenSharedHandleByName);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[34], D3D12MakeResident);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[35], D3D12Evict);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[36], D3D12CreateFence);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[37], D3D12GetDeviceRemovedReason);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[38], D3D12GetCopyableFootprints);
+
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[39], D3D12CreateQueryHeap);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[40], D3D12SetStablePowerState);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[41], D3D12CreateCommandSignature);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[42], D3D12GetResourceTiling);
+	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[43], D3D12GetAdapterLuid);
+
+
 
 	MH_EnableHook((LPVOID)methodVirtualTable[0]);
 	MH_EnableHook((LPVOID)methodVirtualTable[7]);
@@ -404,4 +464,21 @@ void CreateHookD3D12DeviceInterface(uint64_t* methodVirtualTable)
 	MH_EnableHook((LPVOID)methodVirtualTable[22]);
 	MH_EnableHook((LPVOID)methodVirtualTable[23]);
 	MH_EnableHook((LPVOID)methodVirtualTable[27]);
+	MH_EnableHook((LPVOID)methodVirtualTable[28]);
+	MH_EnableHook((LPVOID)methodVirtualTable[29]);
+	MH_EnableHook((LPVOID)methodVirtualTable[30]);
+	MH_EnableHook((LPVOID)methodVirtualTable[31]);
+	MH_EnableHook((LPVOID)methodVirtualTable[32]);
+	MH_EnableHook((LPVOID)methodVirtualTable[33]);
+	MH_EnableHook((LPVOID)methodVirtualTable[34]);
+	MH_EnableHook((LPVOID)methodVirtualTable[35]);
+	MH_EnableHook((LPVOID)methodVirtualTable[36]);
+	MH_EnableHook((LPVOID)methodVirtualTable[37]);
+	MH_EnableHook((LPVOID)methodVirtualTable[38]);
+	MH_EnableHook((LPVOID)methodVirtualTable[39]);
+	MH_EnableHook((LPVOID)methodVirtualTable[40]);
+	MH_EnableHook((LPVOID)methodVirtualTable[41]);
+
+	MH_EnableHook((LPVOID)methodVirtualTable[42]);
+	MH_EnableHook((LPVOID)methodVirtualTable[43]);
 }

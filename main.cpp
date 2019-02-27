@@ -423,9 +423,9 @@ int dx12Thread()
 		MH_Initialize();
 
  		CreateHookD3D12CommandListInterface(dx12::getMethodsTable());
- //		CreateHookD3D12ResourceInterface(dx12::getMethodsTable());
+ 		CreateHookD3D12ResourceInterface(dx12::getMethodsTable());
 // 		
- //		CreateHookD3D12DeviceInterface(dx12::getMethodsTable());
+ 		CreateHookD3D12DeviceInterface(dx12::getMethodsTable());
 
 		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[0], hkD3D12DeviceQueryInterface, (LPVOID*)&oD3D12DeviceQueryInterface);
 		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[8], hkD3D12DeviceCreateCommandQueue, (LPVOID*)&oD3D12DeviceCreateCommandQueue);

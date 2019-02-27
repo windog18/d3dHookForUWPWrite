@@ -71,7 +71,7 @@ inline void Log_WithThreadID(std::string inputStr) {
 static bool once = false;\
 if(once == false){\
 		once = true; \
-		Log(__VA_ARGS__); \
+		Log_WithThreadID(__VA_ARGS__); \
 }\
 
 #define DECLARE_FUNCTIONPTR(DReturnType,DFunctionName,...) \
@@ -99,13 +99,22 @@ extern bool g_record;
 #define GetStreamFromThreadID() \
 GlobalGathering::GetInstance()->GetOrCreateMemStream(GetCurrentThreadId()); \
 
+#define GetStreamFromPtr(ptr) \
+GlobalGathering::GetInstance()->GetOrCreateMemStreamForPtr(ptr); \
+
 #if 1
 #define FUNC_DEFINE
 #else
 #define FUNC_DEFINE \
-	char buf[256]; \
-	sprintf_s(buf,"2020, call the %s \n",__FUNCTION__ ); \
-	OutputDebugStringA(buf);
+	if(g_beginRecord){ \
+	char buf[1024] = {}; \
+	sprintf_s(buf,"call the %s \n",__FUNCTION__ ); \
+	static bool once = false; \
+	if(once == false) { \
+			OutputDebugStringA("call func"); \
+			once = true; \
+		}\
+	} 
 #endif
 
 

@@ -126,6 +126,17 @@ MemStream * GlobalGathering::GetOrCreateMemStream(DWORD threadID)
 	return m_sRecordMemStreamMap[threadID];
 }
 
+MemStream * GlobalGathering::GetOrCreateMemStreamForPtr(void * ptr)
+{
+	std::lock_guard<std::mutex> guard(m_sMutex);
+	if (m_sCommandRecordMemStreamMap.find(ptr) == m_sCommandRecordMemStreamMap.end()) {
+		MemStream *memStream = new MemStream();
+		memStream->init();
+		m_sCommandRecordMemStreamMap.insert(std::make_pair(ptr, memStream));
+	}
+	return m_sCommandRecordMemStreamMap[ptr];
+}
+
 void GlobalGathering::WriteAllBufferToResult()
 {
 	fs::path basePath = fs::path(UWP::Current::Storage::GetTemporaryPath()) / L"DUMP";
@@ -148,6 +159,30 @@ void GlobalGathering::WriteAllBufferToResult()
 			it->second->writeCommandNameToFile(nameCharStrs.c_str());
 		}
 	}
+
+
+	for (std::map<void *, MemStream *>::iterator it = m_sCommandRecordMemStreamMap.begin(); it != m_sCommandRecordMemStreamMap.end(); it++)
+	{
+		wstringstream wss;
+		wss << "RecordData_";
+		wss << it->first;
+		std::error_code ErrorCode;
+		fs::path writePath = basePath / wss.str() / L"recordDataCommandOnly.bin";
+		fs::path writeNamePath = basePath / wss.str() / L"recordDataCommandOnly_name.txt";
+		if (fs::create_directories(writePath.parent_path(), ErrorCode) == false && ErrorCode) {
+			Log("could not create path at: " + narrow(writePath.c_str()));
+		}
+		else {
+			std::string charStrs = narrow(writePath.c_str());
+			it->second->writetoFile(charStrs.c_str());
+
+			std::string nameCharStrs = narrow(writeNamePath.c_str());
+			it->second->writeCommandNameToFile(nameCharStrs.c_str());
+		}
+	}
+
+
+
 }
 
 void GlobalGathering::ResetRecordState()
@@ -157,6 +192,14 @@ void GlobalGathering::ResetRecordState()
 			delete it->second;
 		}
 		m_sRecordMemStreamMap.clear();
+	}
+
+
+	if (m_sCommandRecordMemStreamMap.size() > 0) {
+		for (std::map<void *, MemStream *>::iterator it = m_sCommandRecordMemStreamMap.begin(); it != m_sCommandRecordMemStreamMap.end(); it++) {
+			delete it->second;
+		}
+		m_sCommandRecordMemStreamMap.clear();
 	}
 }
 

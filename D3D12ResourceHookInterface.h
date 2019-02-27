@@ -29,6 +29,7 @@
 DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceQueryInterface, ID3D12Resource * dResource, REFIID riid, void **ppvObject) //0
 {
 	//Log("[D3D12]D3D12Resouces QueryInterface ");
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12ResourceQueryInterface(dResource, riid, ppvObject);
 }
 
@@ -36,26 +37,31 @@ DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceQueryInterface, ID3D12Resource * dReso
 
 DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceSetPrivateData, ID3D12Resource *dResource, REFGUID guid, UINT DataSize, const void *pData) //4
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12ResourceSetPrivateData(dResource, guid, DataSize, pData);
 }
 
 DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceSetPrivateDataInterface, ID3D12Resource *dResource, REFGUID guid, const IUnknown *pData) //5
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12ResourceSetPrivateDataInterface(dResource, guid, pData);
 }
 
 DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceSetName, ID3D12Resource *dResource, LPCWSTR Name) //6
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12ResourceSetName(dResource, Name);
 }
 
 DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceGetDevice, ID3D12Resource *dResource, REFIID riid, void **ppvDevice) //7 
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12ResourceGetDevice(dResource, riid, ppvDevice);
 }
 
 DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceMap, ID3D12Resource *dResource, UINT subresource, const D3D12_RANGE *pReadRange, void **ppData) //8
 {
+	LOG_ONCE(__FUNCTION__);
 	//Log("[D3D12]D3D12Resources Map Resources");
 	HRESULT result = oD3D12ResourceMap(dResource, subresource, pReadRange, ppData);
 	ResourceTempData::SetTempMapData(GetCurrentThreadId(), *ppData);
@@ -71,6 +77,7 @@ DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceMap, ID3D12Resource *dResource, UINT s
 
 DECLARE_FUNCTIONPTR(void, D3D12ResourceUnmap, ID3D12Resource *dResource, UINT subresource, const D3D12_RANGE *pWrittenRange) //9
 {
+	LOG_ONCE(__FUNCTION__);
 	//Log("[D3D12]D3D12Resources Unmap Resources");
 	oD3D12ResourceUnmap(dResource, subresource, pWrittenRange);
 
@@ -104,27 +111,32 @@ DECLARE_FUNCTIONPTR(void, D3D12ResourceUnmap, ID3D12Resource *dResource, UINT su
 
 DECLARE_FUNCTIONPTR(D3D12_RESOURCE_DESC, D3D12ResourceGetDesc, ID3D12Resource *dResource) //10
 {
+	LOG_ONCE(__FUNCTION__);
 	//Log("[D3D12]D3D12Resources GetDesc");
 	return oD3D12ResourceGetDesc(dResource);
 }
 
 DECLARE_FUNCTIONPTR(D3D12_GPU_VIRTUAL_ADDRESS,D3D12GetGPUVirtualAddress, ID3D12Resource * dResource) //11
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetGPUVirtualAddress(dResource);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12WriteToSubresource, ID3D12Resource *dResource, UINT DstSubresource, const D3D12_BOX *pDstBox, const void *pSrcData, UINT SrcRowPitch, UINT SrcDepthPitch)  //12
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12WriteToSubresource(dResource, DstSubresource, pDstBox, pSrcData, SrcRowPitch, SrcDepthPitch);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12ReadFromSubresource, ID3D12Resource *dResource, void *pDstData, UINT DstRowPitch, UINT DstDepthPitch, UINT SrcSubresource, const D3D12_BOX *pSrcBox) //13
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12ReadFromSubresource(dResource, pDstData, DstRowPitch, DstDepthPitch, SrcSubresource, pSrcBox);
 }
 
 DECLARE_FUNCTIONPTR(long, D3D12GetHeapProperties, ID3D12Resource *dResource, D3D12_HEAP_PROPERTIES *pHeapProperties, D3D12_HEAP_FLAGS *pHeapFlags) //14
 {
+	LOG_ONCE(__FUNCTION__);
 	return oD3D12GetHeapProperties(dResource, pHeapProperties, pHeapFlags);
 }
 
