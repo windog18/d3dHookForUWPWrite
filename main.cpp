@@ -80,7 +80,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ExecuteCommandLists, ID3D12CommandQueue * dComman
 
 long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	Log_WithThreadID("[d3d12]present be called");
+	//Log_WithThreadID("[d3d12]present be called");
 	if (InitOnce)
 	{
 		
@@ -150,17 +150,17 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 	bool recordState = GlobalGathering::GetInstance()->IsRecording();
 	static int count = 0;
 	if (g_beginRecord || recordState) {
-// 		if (recordState && count == 2) {
-// 			GlobalGathering::GetInstance()->WriteAllBufferToResult();
-// 			ResetRecordState();
-// 		}
-
-		if (!g_beginRecord && recordState) {
-			//GlobalGathering::GetInstance()->WriteAllBufferToResult();
+		if (recordState) {
+			GlobalGathering::GetInstance()->WriteAllBufferToResult();
 			ResetRecordState();
 		}
-		GlobalGathering::GetInstance()->SetRecording(g_beginRecord);
-		OutputDebugStringA("dsfsdfsfsfsdfs");
+		ToggleRecordState();
+// 		if (!g_beginRecord && recordState) {
+// 			//GlobalGathering::GetInstance()->WriteAllBufferToResult();
+// 			ResetRecordState();
+// 		}
+//		GlobalGathering::GetInstance()->SetRecording(g_beginRecord);
+		//OutputDebugStringA("dsfsdfsfsfsdfs");
 // 		if (count == 2) {
 // 			ToggleRecordState();
 // 			count = 0;
@@ -278,7 +278,7 @@ LRESULT WINAPI DetourWindowProc(
 
  LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	 Log_WithThreadID(__FUNCTION__);
+	 //Log_WithThreadID(__FUNCTION__);
 // 	 if (msg != 132 && msg != 32 && msg != 675) {
 // 		 stringstream ss;
 // 		 ss << msg;
