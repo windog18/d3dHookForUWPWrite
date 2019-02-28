@@ -86,7 +86,7 @@ MH_CreateHook(methodVirtualPtr, hk##DFunctionName, (LPVOID*)&o##DFunctionName)\
 
 
 extern bool g_beginRecord;
-
+extern std::mutex g_mutex;
 
 #define RecordStart \
 	if( GlobalGathering::GetInstance()->IsRecording() ) \
@@ -135,6 +135,25 @@ inline void EndRecord() {
 	OutputDebugStringA("Stop RecordData");
 	ResetRecordState();
 	g_beginRecord = false;
+}
+
+inline void ToggleBeginRecordState() {
+	std::lock_guard<std::mutex> tLock(g_mutex);
+	if (!g_beginRecord) {
+		BeginRecord();
+	}
+	else {
+		EndRecord();
+	}
+}
+
+inline bool GetBeginRecordState() {
+	bool state = false;
+	{
+		std::lock_guard<std::mutex> tLock(g_mutex);
+		state = g_beginRecord;
+	}
+	return state;
 }
 
 

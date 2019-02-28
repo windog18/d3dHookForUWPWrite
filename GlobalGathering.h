@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <sstream>
 
 class MemStream;
 
@@ -69,7 +70,15 @@ public:
 	inline void SetRecording(bool recordState) {
 		{
 			std::lock_guard<std::mutex> lock(m_recordMutex);
+			if (m_isRecording != recordState) {
+				std::stringstream ss;
+				ss << "recording state changed: ";
+				ss << recordState;
+				OutputDebugStringA(ss.str().c_str());
+				//OutputDebugStringA("start recording");
+			}
 			m_isRecording = recordState;
+
 		}
 	}
 

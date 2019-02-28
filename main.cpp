@@ -11,7 +11,7 @@
 #include "./FW1FontWrapper/FW1FontWrapper.h"
 #include <thread>
 bool g_beginRecord = false;
-
+std::mutex g_mutex;
 //=========================================================================================================================// D3D12 HOOKS 
 // D3D12 HOOKS Example
 
@@ -148,19 +148,21 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 	}
 	
 	bool recordState = GlobalGathering::GetInstance()->IsRecording();
+	bool beginRecordState = GetBeginRecordState();
 	static int count = 0;
-	if (g_beginRecord || recordState) {
-		if (recordState) {
-			GlobalGathering::GetInstance()->WriteAllBufferToResult();
-			ResetRecordState();
-		}
-		ToggleRecordState();
-// 		if (!g_beginRecord && recordState) {
-// 			//GlobalGathering::GetInstance()->WriteAllBufferToResult();
+	if (beginRecordState || recordState) {
+// 		if (recordState) {
+// 			GlobalGathering::GetInstance()->WriteAllBufferToResult();
 // 			ResetRecordState();
 // 		}
-//		GlobalGathering::GetInstance()->SetRecording(g_beginRecord);
-		//OutputDebugStringA("dsfsdfsfsfsdfs");
+// 		ToggleRecordState();
+		if (!beginRecordState && recordState) {
+			GlobalGathering::GetInstance()->WriteAllBufferToResult();
+			OutputDebugStringA("start write files");
+			ResetRecordState();
+		}
+		GlobalGathering::GetInstance()->SetRecording(beginRecordState);
+// 		//OutputDebugStringA("dsfsdfsfsfsdfs");
 // 		if (count == 2) {
 // 			ToggleRecordState();
 // 			count = 0;
@@ -287,11 +289,7 @@ LRESULT WINAPI DetourWindowProc(
 // 	 }
 
 	 if (msg == 77) { //F1
-		 if(!g_beginRecord)
-			BeginRecord();
-		 else {
-		    EndRecord();
-		 }
+		 ToggleBeginRecordState();
 	 }
 
 	 switch (msg)

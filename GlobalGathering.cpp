@@ -149,8 +149,11 @@ void GlobalGathering::WriteAllBufferToResult()
 		wss << "RecordData_";
 		wss << it->first;
 		std::error_code ErrorCode;
+
 		fs::path writePath = basePath / wss.str() / L"recordData.bin";
 		fs::path writeNamePath = basePath / wss.str() / L"recordData_name.txt";
+
+		OutputDebugStringW(writePath.c_str());
 		if (fs::create_directories(writePath.parent_path(), ErrorCode) == false && ErrorCode) {
 			Log("could not create path at: " + narrow(writePath.c_str()));
 		}
@@ -203,6 +206,7 @@ void GlobalGathering::WriteAllBufferToResult()
 
 void GlobalGathering::ResetRecordState()
 {
+	std::lock_guard<std::mutex> guard(m_sMutex);
 	if (m_sRecordMemStreamMap.size() > 0) {
 		for (std::map<DWORD, MemStream *>::iterator it = m_sRecordMemStreamMap.begin(); it != m_sRecordMemStreamMap.end(); it++) {
 			delete it->second;

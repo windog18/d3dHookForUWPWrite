@@ -75,10 +75,10 @@ DECLARE_FUNCTIONPTR(long, D3D12DeviceCreateCommandQueue, ID3D12Device *dDevice, 
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateCommandQueue);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(*ppCommandQueue);
+	streaminstance->write(dDevice);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(riid);
+	streaminstance->write(*ppCommandQueue);
 	RecordEnd
 	return res;
 }
@@ -93,10 +93,10 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateCommandAllocator, ID3D12Device *dDevice, D3
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateCommandAllocator);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->write(type);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(*ppCommandAllocator);
+	streaminstance->write(dDevice);
+	streaminstance->write(type);
+	streaminstance->write(riid);
+	streaminstance->write(*ppCommandAllocator);
 	RecordEnd
 	return res;
 }
@@ -117,10 +117,10 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateGraphicsPipelineState, ID3D12Device *dDevic
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateGraphicsPipelineState);
-// 	streaminstance->write(dDevice);
-// 	WriteStream(*pDesc, streaminstance);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(*ppPipelineState);
+	streaminstance->write(dDevice);
+	WriteStream(*pDesc, streaminstance);
+	streaminstance->write(riid);
+	streaminstance->write(*ppPipelineState);
 	RecordEnd
 	return result;
 }
@@ -168,10 +168,10 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateDescriptorHeap, ID3D12Device *dDevice, cons
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateDescriptorHeap);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->writePointerValue(pDescriptorHeapDesc);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(pheap);
+	streaminstance->write(dDevice);
+	streaminstance->writePointerValue(pDescriptorHeapDesc);
+	streaminstance->write(riid);
+	streaminstance->write(pheap);
 	RecordEnd
 	return res;
 }
@@ -194,12 +194,12 @@ REFIID riid, void **ppvRootSignature)                        //16
 	RecordStart
 		MemStream* streaminstance = GetStreamFromThreadID();
 		streaminstance->write(Device_CreateRootSignature);
-// 		streaminstance->write(dDevice);
-// 		streaminstance->write(nodeMask);
-// 		streaminstance->write(blobLengthInBytes);
-// 		streaminstance->write(pBlobWithRootSignature, blobLengthInBytes);
-// 		streaminstance->write(riid);
-// 		streaminstance->write(*ppvRootSignature);
+		streaminstance->write(dDevice);
+		streaminstance->write(nodeMask);
+		streaminstance->write(blobLengthInBytes);
+		streaminstance->write(pBlobWithRootSignature, blobLengthInBytes);
+		streaminstance->write(riid);
+		streaminstance->write(*ppvRootSignature);
 	RecordEnd
 	return ert;
 }
@@ -214,9 +214,9 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateConstantBufferView, ID3D12Device *dDevice, 
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateRootSignature);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(DestDescriptor);
+	streaminstance->write(dDevice);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(DestDescriptor);
 	RecordEnd
 
 	return;
@@ -233,10 +233,10 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateShaderResourceView, ID3D12Device *dDevice, 
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateShaderResourceView);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->write(pResource);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(DestDescriptor);
+	streaminstance->write(dDevice);
+	streaminstance->write(pResource);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(DestDescriptor);
 
 	//ID3D12DescriptorHeap* heap = XD3D12DescriptorHeap::m_handlemap1[DestDescriptor.ptr];
 	//streaminstance->write(heap);
@@ -254,11 +254,11 @@ const D3D12_UNORDERED_ACCESS_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestD
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateUnorderedAccessView);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->write(pResource);
-// 	streaminstance->write(pCounterResource);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(DestDescriptor);
+	streaminstance->write(dDevice);
+	streaminstance->write(pResource);
+	streaminstance->write(pCounterResource);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(DestDescriptor);
 	RecordEnd
 
 }
@@ -272,9 +272,9 @@ const D3D12_RENDER_TARGET_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDesc
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateRenderTargetView);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(DestDescriptor);
+	streaminstance->write(dDevice);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(DestDescriptor);
 	RecordEnd
 
 }
@@ -289,10 +289,10 @@ const D3D12_DEPTH_STENCIL_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDesc
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateDepthStencilView);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->write(pResource);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(DestDescriptor);
+	streaminstance->write(dDevice);
+	streaminstance->write(pResource);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(DestDescriptor);
 	RecordEnd
 }
 
@@ -303,9 +303,9 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateSampler, ID3D12Device *dDevice, const D3D12
 
 	RecordStart
 	MemStream* instancestream = GetStreamFromThreadID();
-// 	instancestream->write(Device_CreateSampler);
-// 	instancestream->write(dDevice);
-// 	instancestream->write(*pDesc);
+	instancestream->write(Device_CreateSampler);
+	instancestream->write(dDevice);
+	instancestream->write(*pDesc);
 // 
 // 	//ID3D12DescriptorHeap* heap = XD3D12DescriptorHeap::m_handlemap1[DestDescriptor.ptr];
 // 	instancestream->write(DestDescriptor);
@@ -324,13 +324,13 @@ const UINT *pSrcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeaps
 	RecordStart
 	MemStream* instancestream = GetStreamFromThreadID();
 	instancestream->write(dDevice);
-// 	instancestream->write(NumDestDescriptorRanges);
-// 	instancestream->write(pDestDescriptorRangeStarts);
-// 	instancestream->write(pDestDescriptorRangeSizes);
-// 	instancestream->write(NumSrcDescriptorRanges);
-// 	instancestream->write(pSrcDescriptorRangeStarts);
-// 	instancestream->write(pSrcDescriptorRangeSizes);
-// 	instancestream->write(DescriptorHeapsType);
+	instancestream->write(NumDestDescriptorRanges);
+	instancestream->write(pDestDescriptorRangeStarts);
+	instancestream->write(pDestDescriptorRangeSizes);
+	instancestream->write(NumSrcDescriptorRanges);
+	instancestream->write(pSrcDescriptorRangeStarts);
+	instancestream->write(pSrcDescriptorRangeSizes);
+	instancestream->write(DescriptorHeapsType);
 	RecordEnd
 	return;
 }
@@ -380,13 +380,13 @@ void **ppvResource) //27
 	streaminstance->write(Device_CreateCommittedResource);
 
 	streaminstance->write(dDevice);
-// 	streaminstance->write(*pHeapProperties);
-// 	streaminstance->write(HeapFlags);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(InitialResourceState);
-// 	streaminstance->writePointerValue(pOptimizedClearValue);
-// 	streaminstance->write(riidResource);
-// 	streaminstance->write(pres);
+	streaminstance->write(*pHeapProperties);
+	streaminstance->write(HeapFlags);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(InitialResourceState);
+	streaminstance->writePointerValue(pOptimizedClearValue);
+	streaminstance->write(riidResource);
+	streaminstance->write(pres);
 	RecordEnd
 	return result;
 }
@@ -399,10 +399,10 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateHeap, ID3D12Device *dDevice, const D3D12_HE
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateHeap);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(*ppvHeap);
+	streaminstance->write(dDevice);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(riid);
+	streaminstance->write(*ppvHeap);
 	RecordEnd
 
 	return res;
@@ -417,14 +417,14 @@ D3D12_RESOURCE_STATES InitialState, const D3D12_CLEAR_VALUE *pOptimizedClearValu
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreatePlacedResource);
-// 	streaminstance->write(dDevice);
-// 	streaminstance->write(pHeap);
-// 	streaminstance->write(HeapOffset);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(InitialState);
-// 	streaminstance->writePointerValue(pOptimizedClearValue);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(*ppvResource);
+	streaminstance->write(dDevice);
+	streaminstance->write(pHeap);
+	streaminstance->write(HeapOffset);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(InitialState);
+	streaminstance->writePointerValue(pOptimizedClearValue);
+	streaminstance->write(riid);
+	streaminstance->write(*ppvResource);
 	RecordEnd
 	return res;
 }
@@ -437,11 +437,11 @@ const D3D12_CLEAR_VALUE *pOptimizedClearValue, REFIID riid, void **ppvResource) 
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateReservedResource);
-// 	streaminstance->writePointerValue(pDesc);
-// 	streaminstance->write(InitialState);
-// 	streaminstance->writePointerValue(pOptimizedClearValue);
-// 	streaminstance->write(riid);
-// 	streaminstance->write(*ppvResource);
+	streaminstance->writePointerValue(pDesc);
+	streaminstance->write(InitialState);
+	streaminstance->writePointerValue(pOptimizedClearValue);
+	streaminstance->write(riid);
+	streaminstance->write(*ppvResource);
 	RecordEnd
 	return res;
 }
