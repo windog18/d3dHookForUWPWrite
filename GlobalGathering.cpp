@@ -1,10 +1,11 @@
 #include "GlobalGathering.h"
 #include "memstream.h"
 
-std::map<DWORD, void *> ResourceTempData::m_sTempMap;
-std::mutex ResourceTempData::m_sMutex;
+std::map<DWORD, void *> ResourceTempData<DWORD, void *>::m_sTempMap;
+std::mutex ResourceTempData<DWORD, void *>::m_sMutex;
 
-
+std::map<UINT64, ID3D12DescriptorHeap *> ResourceTempData<UINT64, ID3D12DescriptorHeap *>::m_sTempMap;
+std::mutex ResourceTempData<UINT64, ID3D12DescriptorHeap *>::m_sMutex;
 
 
 GlobalGathering * GlobalGathering::m_sSingleton = nullptr;
@@ -158,7 +159,7 @@ void GlobalGathering::WriteAllBufferToResult()
 		fs::path writePath = basePath / wss.str() / L"recordData.bin";
 		fs::path writeNamePath = basePath / wss.str() / L"recordData_name.txt";
 
-		OutputDebugStringW(writePath.c_str());
+		//OutputDebugStringW(writePath.c_str());
 		if (fs::create_directories(writePath.parent_path(), ErrorCode) == false && ErrorCode) {
 			Log("could not create path at: " + narrow(writePath.c_str()));
 		}

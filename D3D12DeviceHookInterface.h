@@ -72,14 +72,14 @@ DECLARE_FUNCTIONPTR(long, D3D12DeviceCreateCommandQueue, ID3D12Device *dDevice, 
 	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	LOG_ONCE(__FUNCTION__);
 	auto res = oD3D12DeviceCreateCommandQueue(dDevice, pDesc, riid, ppCommandQueue);
-	RecordStart
-	MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateCommandQueue);
-	streaminstance->write(dDevice);
-	streaminstance->writePointerValue(pDesc);
-	streaminstance->write(riid);
-	streaminstance->write(*ppCommandQueue);
-	RecordEnd
+// 	RecordStart
+// 	MemStream* streaminstance = GetStreamFromThreadID();
+// 	streaminstance->write(Device_CreateCommandQueue);
+// 	streaminstance->write(dDevice);
+// 	streaminstance->writePointerValue(pDesc);
+// 	streaminstance->write(riid);
+// 	streaminstance->write(*ppCommandQueue);
+// 	RecordEnd
 	return res;
 }
 
@@ -90,14 +90,14 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateCommandAllocator, ID3D12Device *dDevice, D3
 	LOG_ONCE(__FUNCTION__);
 
 	auto res = oD3D12CreateCommandAllocator(dDevice, type, riid, ppCommandAllocator);
-	RecordStart
-	MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateCommandAllocator);
-	streaminstance->write(dDevice);
-	streaminstance->write(type);
-	streaminstance->write(riid);
-	streaminstance->write(*ppCommandAllocator);
-	RecordEnd
+// 	RecordStart
+// 	MemStream* streaminstance = GetStreamFromThreadID();
+// 	streaminstance->write(Device_CreateCommandAllocator);
+// 	streaminstance->write(dDevice);
+// 	streaminstance->write(type);
+// 	streaminstance->write(riid);
+// 	streaminstance->write(*ppCommandAllocator);
+// 	RecordEnd
 	return res;
 }
 
@@ -213,7 +213,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateConstantBufferView, ID3D12Device *dDevice, 
 
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateRootSignature);
+	streaminstance->write(Device_CreateConstantBufferView);
 	streaminstance->write(dDevice);
 	streaminstance->writePointerValue(pDesc);
 	streaminstance->write(DestDescriptor);
@@ -236,6 +236,9 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateShaderResourceView, ID3D12Device *dDevice, 
 	streaminstance->write(dDevice);
 	streaminstance->write(pResource);
 	streaminstance->writePointerValue(pDesc);
+
+	UINT offsetsize = dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 	streaminstance->write(DestDescriptor);
 
 	//ID3D12DescriptorHeap* heap = XD3D12DescriptorHeap::m_handlemap1[DestDescriptor.ptr];
@@ -251,15 +254,15 @@ const D3D12_UNORDERED_ACCESS_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestD
 	//Log("[d3d12] D3D12CreateUnorderedAccessView");
 	oD3D12CreateUnorderedAccessView(dDevice, pResource, pCounterResource, pDesc, DestDescriptor);
 
-	RecordStart
-	MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateUnorderedAccessView);
-	streaminstance->write(dDevice);
-	streaminstance->write(pResource);
-	streaminstance->write(pCounterResource);
-	streaminstance->writePointerValue(pDesc);
-	streaminstance->write(DestDescriptor);
-	RecordEnd
+// 	RecordStart
+// 	MemStream* streaminstance = GetStreamFromThreadID();
+// 	streaminstance->write(Device_CreateUnorderedAccessView);
+// 	streaminstance->write(dDevice);
+// 	streaminstance->write(pResource);
+// 	streaminstance->write(pCounterResource);
+// 	streaminstance->writePointerValue(pDesc);
+// 	streaminstance->write(DestDescriptor);
+// 	RecordEnd
 
 }
 
@@ -269,13 +272,13 @@ const D3D12_RENDER_TARGET_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDesc
 	LOG_ONCE(__FUNCTION__);
 	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	oD3D12CreateRenderTargetView(dDevice, pResource, pDesc, DestDescriptor);
-	RecordStart
-	MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateRenderTargetView);
-	streaminstance->write(dDevice);
-	streaminstance->writePointerValue(pDesc);
-	streaminstance->write(DestDescriptor);
-	RecordEnd
+// 	RecordStart
+// 	MemStream* streaminstance = GetStreamFromThreadID();
+// 	streaminstance->write(Device_CreateRenderTargetView);
+// 	streaminstance->write(dDevice);
+// 	streaminstance->writePointerValue(pDesc);
+// 	streaminstance->write(DestDescriptor);
+// 	RecordEnd
 
 }
 
@@ -286,14 +289,14 @@ const D3D12_DEPTH_STENCIL_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDesc
 	//GlobalGathering::GetInstance()->GatherDevice(dDevice);
 	oD3D12CreateDepthStencilView(dDevice, pResource, pDesc, DestDescriptor);
 	
-	RecordStart
-	MemStream* streaminstance = GetStreamFromThreadID();
-	streaminstance->write(Device_CreateDepthStencilView);
-	streaminstance->write(dDevice);
-	streaminstance->write(pResource);
-	streaminstance->writePointerValue(pDesc);
-	streaminstance->write(DestDescriptor);
-	RecordEnd
+// 	RecordStart
+// 	MemStream* streaminstance = GetStreamFromThreadID();
+// 	streaminstance->write(Device_CreateDepthStencilView);
+// 	streaminstance->write(dDevice);
+// 	streaminstance->write(pResource);
+// 	streaminstance->writePointerValue(pDesc);
+// 	streaminstance->write(DestDescriptor);
+// 	RecordEnd
 }
 
 DECLARE_FUNCTIONPTR(void, D3D12CreateSampler, ID3D12Device *dDevice, const D3D12_SAMPLER_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //22
@@ -306,9 +309,10 @@ DECLARE_FUNCTIONPTR(void, D3D12CreateSampler, ID3D12Device *dDevice, const D3D12
 	instancestream->write(Device_CreateSampler);
 	instancestream->write(dDevice);
 	instancestream->write(*pDesc);
+
 // 
 // 	//ID3D12DescriptorHeap* heap = XD3D12DescriptorHeap::m_handlemap1[DestDescriptor.ptr];
-// 	instancestream->write(DestDescriptor);
+ 	instancestream->write(DestDescriptor);
 	RecordEnd
 }
 
@@ -321,17 +325,18 @@ const UINT *pSrcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeaps
 	oD3D12CopyDescriptors(dDevice, NumDestDescriptorRanges, pDestDescriptorRangeStarts, pDestDescriptorRangeSizes,
 		NumSrcDescriptorRanges, pSrcDescriptorRangeStarts, pSrcDescriptorRangeSizes, DescriptorHeapsType);
 
-	RecordStart
-	MemStream* instancestream = GetStreamFromThreadID();
-	instancestream->write(dDevice);
-	instancestream->write(NumDestDescriptorRanges);
-	instancestream->write(pDestDescriptorRangeStarts);
-	instancestream->write(pDestDescriptorRangeSizes);
-	instancestream->write(NumSrcDescriptorRanges);
-	instancestream->write(pSrcDescriptorRangeStarts);
-	instancestream->write(pSrcDescriptorRangeSizes);
-	instancestream->write(DescriptorHeapsType);
-	RecordEnd
+// 	RecordStart
+// 	MemStream* instancestream = GetStreamFromThreadID();
+// 	instancestream->write(Device_CopyDescriptors);
+// 	instancestream->write(dDevice);
+// 	instancestream->write(NumDestDescriptorRanges);
+// 	instancestream->write(pDestDescriptorRangeStarts);
+// 	instancestream->write(pDestDescriptorRangeSizes);
+// 	instancestream->write(NumSrcDescriptorRanges);
+// 	instancestream->write(pSrcDescriptorRangeStarts);
+// 	instancestream->write(pSrcDescriptorRangeSizes);
+// 	instancestream->write(DescriptorHeapsType);
+// 	RecordEnd
 	return;
 }
 
@@ -378,7 +383,6 @@ void **ppvResource) //27
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateCommittedResource);
-
 	streaminstance->write(dDevice);
 	streaminstance->write(*pHeapProperties);
 	streaminstance->write(HeapFlags);
@@ -437,7 +441,7 @@ const D3D12_CLEAR_VALUE *pOptimizedClearValue, REFIID riid, void **ppvResource) 
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateReservedResource);
-	streaminstance->writePointerValue(pDesc);
+	streaminstance->writePointerValue(dDevice);
 	streaminstance->write(InitialState);
 	streaminstance->writePointerValue(pOptimizedClearValue);
 	streaminstance->write(riid);

@@ -80,7 +80,11 @@ public:
 
 	inline void WriteToMemStream(const void *src, size_t tSize) {
 		if (tSize + streamcount >= memhandle.size()) {
-			memhandle.resize(memhandle.size() * 2);
+			int increSize = memhandle.size() * 2;
+			if (tSize > memhandle.size()) {
+				increSize = 2 * tSize;
+			}
+			memhandle.resize(increSize);
 			streamhandle = &memhandle[streamcount];
 		}
 		memcpy(streamhandle, src, tSize);

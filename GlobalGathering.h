@@ -10,16 +10,17 @@
 
 class MemStream;
 
+template<typename Key, typename Value>
 class ResourceTempData {
 public:
 	
- 	static void SetTempMapData(DWORD threadID,void *ptr) {
+ 	static void SetTempMapData(Key threadID,Value ptr) {
 		std::lock_guard<std::mutex> lock(m_sMutex);
 		m_sTempMap[threadID] = ptr;
 	}
 
 
-	static void* GetTempMapData(DWORD threadID) {
+	static void* GetTempMapData(Key threadID) {
 		void *ptr = NULL;
 		{
 			std::lock_guard<std::mutex> lock(m_sMutex);
@@ -34,7 +35,7 @@ public:
 		m_sTempMap.clear();
 	}
 private:
-	static std::map<DWORD, void *>  m_sTempMap;
+	static std::map<Key, Value>  m_sTempMap;
 
 	static std::mutex m_sMutex;
 };

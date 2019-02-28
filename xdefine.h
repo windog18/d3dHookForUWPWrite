@@ -119,7 +119,8 @@ enum CommandEnum
 	Resource_Map,
 	Resource_Unmap,
 	Resource_GetGPUVirtualAddress,
-	end_frame,
+		end_frame,
+		end_File,
 
 	forcedw = 0xffffffff
 };

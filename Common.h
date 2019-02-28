@@ -75,7 +75,7 @@ GlobalGathering::GetInstance()->GetOrCreateMemStreamForPtr(ptr); \
 
 inline void ResetRecordState()
 {
-	ResourceTempData::Reset();
+	ResourceTempData<DWORD,void *>::Reset();
 	GlobalGathering::GetInstance()->ResetRecordState();
 }
 

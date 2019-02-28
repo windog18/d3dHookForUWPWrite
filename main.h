@@ -17,6 +17,7 @@
 // #include <string>
 // #include <vector>
 #include "Common.h"
+#include <combaseapi.h>
 
 namespace dx12
 {
@@ -181,6 +182,19 @@ dx12::Status::Enum dx12::init(RenderType::Enum _renderType)
 					return Status::UnknownError;
 				}
 
+				ID3D12DescriptorHeap *rtvHeap;
+				D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+				rtvHeapDesc.NumDescriptors = 1;
+				rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+				rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+				if (device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&rtvHeap)) < 0)
+				{
+					::DestroyWindow(window);
+					::UnregisterClass(windowClass.lpszClassName, windowClass.hInstance);
+					return Status::UnknownError;
+				}
+
+
 				DXGI_RATIONAL refreshRate;
 				refreshRate.Numerator = 60;
 				refreshRate.Denominator = 1;
@@ -223,6 +237,7 @@ dx12::Status::Enum dx12::init(RenderType::Enum _renderType)
 				memcpy(g_methodsTable + 44 + 19 + 9, *(uint64_t**)commandList, 60 * sizeof(uint64_t));
 				memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint64_t**)swapChain, 18 * sizeof(uint64_t));
 				memcpy(g_methodsTable + 44 + 19 + 9 + 60 + 18, *(uint64_t**)d3dResources, 15 * sizeof(uint64_t));
+				memcpy(g_methodsTable + 44 + 19 + 9 + 60 + 18 + 15, *(uint64_t**)rtvHeap, 3 * sizeof(uint64_t));
 #elif defined _M_IX86
 				g_methodsTable = (uint32_t*)::calloc(44 + 19 + 9 + 60 + 18 + 15, sizeof(uint32_t));
 				memcpy(g_methodsTable, *(uint32_t**)device, 44 * sizeof(uint32_t));
@@ -231,10 +246,14 @@ dx12::Status::Enum dx12::init(RenderType::Enum _renderType)
 				memcpy(g_methodsTable + 44 + 19 + 9, *(uint32_t**)commandList, 60 * sizeof(uint32_t));
 				memcpy(g_methodsTable + 44 + 19 + 9 + 60, *(uint32_t**)swapChain, 18 * sizeof(uint32_t));
 				memcpy(g_methodsTable + 44 + 19 + 9 + 60 + 18, *(uint32_t**)d3dResources, 15 * sizeof(uint32_t));
+				memcpy(g_methodsTable + 44 + 19 + 9 + 60 + 18 + 15, *(uint32_t**)rtvHeap, 3 * sizeof(uint32_t));
 #endif
 
 				device->Release();
 				device = NULL;
+
+				rtvHeap->Release();
+				rtvHeap = NULL;
 
 				d3dResources->Release();
 				d3dResources = NULL;

@@ -3,7 +3,7 @@
 
 
 
-const int MaxDatasize = 100 * 1024 * 1024;
+const int MaxDatasize = 10 * 1024 * 1024;
 
 const int MaxCallSequenceSize = 1024 * 1024 * 1024;
 

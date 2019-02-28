@@ -75,7 +75,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListGetPrivateData, ID3D12GraphicsCommandL
 {
 	auto res = oD3D12CommandListGetPrivateData(dCommandList, guid, pDataSize, pData);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_GetPrivateData);
 	RecordEnd
 
@@ -86,7 +86,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListSetPrivateData, ID3D12GraphicsCommandL
 {
 	auto res = oD3D12CommandListSetPrivateData(dCommandList, guid, DataSize, pData);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetPrivateData);
 	RecordEnd
 
@@ -98,7 +98,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListSetPrivateDataInterface, ID3D12Graphic
 	auto res = oD3D12CommandListSetPrivateDataInterface(dCommandList, guid, pData);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetPrivateDataInterface);
 	RecordEnd
 	return res;
@@ -108,7 +108,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListSetName, ID3D12GraphicsCommandList *dC
 {
 	auto res = oD3D12CommandListSetName(dCommandList, name);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetName);
 	RecordEnd
 	return res;
@@ -120,7 +120,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListGetDevice, ID3D12GraphicsCommandList *
 	auto res = oD3D12CommandListGetDevice(dCommandList, riid, ppvDevice);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_GetDevice);
 	RecordEnd
 
@@ -132,7 +132,7 @@ DECLARE_FUNCTIONPTR(D3D12_COMMAND_LIST_TYPE, D3D12CommandListGetType, ID3D12Grap
 	auto res = oD3D12CommandListGetType(dCommandList);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_GetType);
 	RecordEnd
 
@@ -144,7 +144,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListClose, ID3D12GraphicsCommandList *dCom
 	auto res = oD3D12CommandListClose(dCommandList);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_Close);
 	RecordEnd
 
@@ -156,7 +156,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CommandListReset, ID3D12GraphicsCommandList *dCom
 	auto res = oD3D12CommandListReset(dCommandList);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_Reset);
 	RecordEnd
 
@@ -168,7 +168,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListClearState, ID3D12GraphicsCommandList 
 	oD3D12CommandListClearState(dCommandList, pPipelineState);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ClearState);
 	RecordEnd
 
@@ -183,7 +183,7 @@ DECLARE_FUNCTIONPTR(void, D3D12DrawInstanced, ID3D12GraphicsCommandList *dComman
 // 	Log(ss.str() + " [d3d12] D3D12DrawInstanced");
  	oD3D12DrawInstanced(dCommandList, VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_DrawInstanced);
 	streamInstance->write(dCommandList);
 	streamInstance->write(VertexCountPerInstance);
@@ -200,7 +200,7 @@ DECLARE_FUNCTIONPTR(void, D3D12DrawIndexedInstanced, ID3D12GraphicsCommandList *
 	oD3D12DrawIndexedInstanced(dCommandList, IndexCount, InstanceCount, StartIndex, BaseVertex);
 	RecordStart
 
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandList_DrawIndexedInstanced);
 	streamInstance->write(dCommandList);
 	streamInstance->write(IndexCount);
@@ -215,7 +215,7 @@ DECLARE_FUNCTIONPTR(void, D3D12Dispatch, ID3D12GraphicsCommandList *dCommandList
 	oD3D12Dispatch(dCommandList, ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_Dispatch);
 	RecordEnd
 
@@ -227,7 +227,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CopyBufferRegion, ID3D12GraphicsCommandList *dCom
 	FUNC_DEFINE
 	oD3D12CopyBufferRegion(dCommandList, pDstBuffer, DstOffset, pSrcBuffer, SrcOffset, NumBytes);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_CopyBufferRegion);
 	streamInstance->write(dCommandList);
 	streamInstance->write(pDstBuffer);
@@ -244,7 +244,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CopyTextureRegion, ID3D12GraphicsCommandList *dCo
 	oD3D12CopyTextureRegion(dCommandList, pDst, DstX, DstY, DstZ, pSrc, pSrcBox);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_CopyTextureRegion);
 	streamInstance->write(dCommandList);
 	streamInstance->writePointerValue(pDst);
@@ -262,7 +262,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CopyResource, ID3D12GraphicsCommandList *dCommand
 	oD3D12CopyResource(dCommandList, pDstResource, pSrcResource);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_CopyResource);
 	RecordEnd
 
@@ -275,7 +275,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CopyTiles, ID3D12GraphicsCommandList *dCommandLis
 	oD3D12CopyTiles(dCommandList, pTiledResource, pTileRegionStartCoordinate, pTileRegionSize, pBuffer, BufferStartOffsetInBytes, Flags);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_CopyTiles);
 	RecordEnd
 
@@ -287,7 +287,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ResolveSubresource, ID3D12GraphicsCommandList *dC
 	oD3D12ResolveSubresource(dCommandList, pDstResource, DstSubresource, pSrcResource, SrcSubresource, Format);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ResolveSubresource);
 	RecordEnd
 
@@ -300,7 +300,7 @@ DECLARE_FUNCTIONPTR(void, D3D12IASetPrimitiveTopology, ID3D12GraphicsCommandList
 	FUNC_DEFINE
 	oD3D12IASetPrimitiveTopology(dCommandList, PrimitiveTopology);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(dCommandList);
 	streamInstance->write(PrimitiveTopology);
 	RecordEnd
@@ -311,7 +311,7 @@ DECLARE_FUNCTIONPTR(void, D3D12RSSetViewports, ID3D12GraphicsCommandList *dComma
 	oD3D12RSSetViewports(dCommandList, NumViewports, pViewports);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_RSSetViewports);
 	RecordEnd
 
@@ -324,7 +324,7 @@ DECLARE_FUNCTIONPTR(void, D3D12RSSetScissorRects, ID3D12GraphicsCommandList *dCo
 	oD3D12RSSetScissorRects(dCommandList, NumRects, pRects);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_RSSetScissorRects);
 	RecordEnd
 
@@ -336,7 +336,7 @@ DECLARE_FUNCTIONPTR(void, D3D12OMSetBlendFactor, ID3D12GraphicsCommandList *dCom
 	 oD3D12OMSetBlendFactor(dCommandList, BlendFactor);
 
 	 RecordStart
-	 MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	 MemStream *streamInstance = GetStreamFromThreadID();
 	 streamInstance->write(CommandEnum::CommandList_OMSetBlendFactor);
 	 RecordEnd
 
@@ -348,7 +348,7 @@ DECLARE_FUNCTIONPTR(void, D3D12OMSetStencilRef, ID3D12GraphicsCommandList *dComm
 	oD3D12OMSetStencilRef(dCommandList, StencilRef);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_OMSetStencilRef);
 	RecordEnd
 
@@ -360,7 +360,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetPipelineState, ID3D12GraphicsCommandList *dCom
 	FUNC_DEFINE
 	oD3D12SetPipelineState(dCommandList, pPipelineState);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandList_SetPipelineState);
 	streamInstance->write(dCommandList);
 	streamInstance->write(pPipelineState);
@@ -372,7 +372,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ResourceBarrier, ID3D12GraphicsCommandList *dComm
 	oD3D12ResourceBarrier(dCommandList, NumBarriers, pBarriers);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ResourceBarrier);
 	RecordEnd
 
@@ -384,7 +384,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ExecuteBundle, ID3D12GraphicsCommandList *dComman
 	oD3D12ExecuteBundle(dCommandList, pCommandList);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ExecuteBundle);
 	RecordEnd
 
@@ -396,7 +396,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetDescriptorHeaps, ID3D12GraphicsCommandList *dC
 	FUNC_DEFINE
 	oD3D12SetDescriptorHeaps(dCommandList, NumDescriptorHeaps, ppDescriptorHeaps);
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetDescriptorHeaps);
 	streamInstance->write(dCommandList);
 	streamInstance->write(NumDescriptorHeaps);
@@ -410,7 +410,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRootSignature, ID3D12GraphicsCommandLis
 	oD3D12SetComputeRootSignature(dCommandList, pRootSignature);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRootSignature);
 	RecordEnd
 
@@ -422,7 +422,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRootSignature, ID3D12GraphicsCommandLi
 	FUNC_DEFINE
 	//Log("[d3d12] D3D12SetGraphicsRootSignature");
 	RecordStart
-	MemStream* streaminstance = GetStreamFromPtr(dCommandList);
+	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(CommandList_SetGraphicsRootSignature);
 	streaminstance->write(dCommandList);
 	streaminstance->write(pRootSignature);
@@ -437,7 +437,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRootDescriptorTable, ID3D12GraphicsComm
 	oD3D12SetComputeRootDescriptorTable(dCommandList, RootParameterIndex, BaseDescriptor);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRootDescriptorTable);
 	RecordEnd
 
@@ -449,7 +449,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRootDescriptorTable, ID3D12GraphicsCom
 	FUNC_DEFINE
 	oD3D12SetGraphicsRootDescriptorTable(dCommandList, RootParameterIndex, BaseDescriptor);
 	RecordStart
-	MemStream* instance = GetStreamFromPtr(dCommandList);
+	MemStream* instance = GetStreamFromThreadID();
 	instance->write(CommandList_SetGraphicsRootDescriptorTable);
 	instance->write(dCommandList);
 	instance->write(RootParameterIndex);
@@ -463,7 +463,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRoot32BitConstant, ID3D12GraphicsComman
 	oD3D12SetComputeRoot32BitConstant(dCommandList, RootParameterIndex, SrcData, DestOffsetIn32BitValues);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRoot32BitConstant);
 	RecordEnd
 
@@ -476,7 +476,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRoot32BitConstant, ID3D12GraphicsComma
 	oD3D12SetGraphicsRoot32BitConstant(dCommandList, RootParameterIndex, SrcData, DestOffsetIn32BitValues);
 
 	RecordStart
-	MemStream* instance = GetStreamFromPtr(dCommandList);
+	MemStream* instance = GetStreamFromThreadID();
 	instance->write(CommandList_SetGraphicsRoot32BitConstant);
 	instance->write(dCommandList);
 	instance->write(RootParameterIndex);
@@ -491,7 +491,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRoot32BitConstants, ID3D12GraphicsComma
 	oD3D12SetComputeRoot32BitConstants(dCommandList, RootParameterIndex, Num32BitValuesToSet, pSrcData, DestOffsetIn32BitValues);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRoot32BitConstants);
 	RecordEnd
 
@@ -504,7 +504,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRoot32BitConstants, ID3D12GraphicsComm
 	oD3D12SetGraphicsRoot32BitConstants(dCommandList, RootParameterIndex, Num32BitValuesToSet, pSrcData, DestOffsetIn32BitValues);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetGraphicsRoot32BitConstants);
 	RecordEnd
 
@@ -516,7 +516,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRootConstantBufferView, ID3D12GraphicsC
 	oD3D12SetComputeRootConstantBufferView(dCommandList, RootParameterIndex, BufferLocation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRootConstantBufferView);
 	RecordEnd
 
@@ -528,7 +528,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRootConstantBufferView, ID3D12Graphics
 	oD3D12SetGraphicsRootConstantBufferView(dCommandList, RootParameterIndex, BufferLocation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetGraphicsRootConstantBufferView);
 	RecordEnd
 
@@ -540,7 +540,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRootShaderResourceView, ID3D12GraphicsC
 	oD3D12SetComputeRootShaderResourceView(dCommandList, RootParameterIndex, BufferLocation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRootShaderResourceView);
 	RecordEnd
 
@@ -552,7 +552,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRootShaderResourceView, ID3D12Graphics
 	oD3D12SetGraphicsRootShaderResourceView(dCommandList, RootParameterIndex, BufferLocation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetGraphicsRootShaderResourceView);
 	RecordEnd
 
@@ -564,7 +564,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetComputeRootUnorderedAccessView, ID3D12Graphics
 	oD3D12SetComputeRootUnorderedAccessView(dCommandList, RootParameterIndex, BufferLocation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetComputeRootUnorderedAccessView);
 	RecordEnd
 
@@ -576,7 +576,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetGraphicsRootUnorderedAccessView, ID3D12Graphic
 	oD3D12SetGraphicsRootUnorderedAccessView(dCommandList, RootParameterIndex, BufferLocation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetGraphicsRootUnorderedAccessView);
 	RecordEnd
 
@@ -589,7 +589,7 @@ DECLARE_FUNCTIONPTR(void, D3D12IASetIndexBuffer, ID3D12GraphicsCommandList *dCom
 	LOG_ONCE("[d3d12] D3D12IASetIndexBuffer");
 	oD3D12IASetIndexBuffer(dCommandList, pView);
 	RecordStart
-	MemStream* streaminstance = GetStreamFromPtr(dCommandList);
+	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(CommandList_IASetIndexBuffer);
 	streaminstance->write(dCommandList);
 	streaminstance->writePointerValue(pView);
@@ -603,7 +603,7 @@ DECLARE_FUNCTIONPTR(void, D3D12IASetVertexBuffers, ID3D12GraphicsCommandList *dC
 	oD3D12IASetVertexBuffers(dCommandList, StartSlot, NumViews, pViews);
 
 	RecordStart
-	MemStream* streaminstance = GetStreamFromPtr(dCommandList);
+	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(CommandList_IASetVertexBuffers);
 	streaminstance->write(dCommandList);
 	streaminstance->write(StartSlot);
@@ -617,7 +617,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SOSetTargets, ID3D12GraphicsCommandList *dCommand
 	oD3D12SOSetTargets(dCommandList, StartSlot, NumViews, pViews);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SOSetTargets);
 	RecordEnd
 
@@ -630,7 +630,7 @@ BOOL RTsSingleHandleToDescriptorRange, const D3D12_CPU_DESCRIPTOR_HANDLE *pDepth
 	oD3D12OMSetRenderTargets(dCommandList, NumRenderTargetDescriptors, pRenderTargetDescriptors, RTsSingleHandleToDescriptorRange, pDepthStencilDescriptor);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_OMSetRenderTargets);
 	RecordEnd
 
@@ -643,7 +643,7 @@ FLOAT Depth, UINT8 Stencil, UINT NumRects, const D3D12_RECT *pRects)  //72 + 47
 	oD3D12ClearDepthStencilView(dCommandList, DepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ClearDepthStencilView);
 	RecordEnd
 
@@ -656,7 +656,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ClearRenderTargetView, ID3D12GraphicsCommandList 
 	oD3D12ClearRenderTargetView(dCommandList, RenderTargetView, ColorRGBA, NumRects, pRects);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ClearRenderTargetView);
 	RecordEnd
 
@@ -670,7 +670,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ClearUnorderedAccessViewUint, ID3D12GraphicsComma
 	oD3D12ClearUnorderedAccessViewUint(dCommandList, ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ClearUnorderedAccessViewUint);
 	RecordEnd
 
@@ -683,7 +683,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE ViewCPUHandle, ID3D12Resource *pResource, const FLOA
 	oD3D12ClearUnorderedAccessViewFloat(dCommandList, ViewGPUHandleInCurrentHeap, ViewCPUHandle, pResource, Values, NumRects, pRects);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ClearUnorderedAccessViewFloat);
 	RecordEnd
 
@@ -695,7 +695,7 @@ DECLARE_FUNCTIONPTR(void, D3D12DiscardResource, ID3D12GraphicsCommandList *dComm
 	oD3D12DiscardResource(dCommandList, pResource, pRegion);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_DiscardResource);
 	RecordEnd
 
@@ -707,7 +707,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListBeginQuery, ID3D12GraphicsCommandList 
 	oD3D12CommandListBeginQuery(dCommandList, pQueryHeap, Type, Index);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_BeginQuery);
 	RecordEnd
 
@@ -719,7 +719,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListEndQuery, ID3D12GraphicsCommandList *d
 	oD3D12CommandListEndQuery(dCommandList, pQueryHeap, Type, Index);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_EndQuery);
 	RecordEnd
 
@@ -732,7 +732,7 @@ UINT NumQueries, ID3D12Resource *pDestinationBuffer, UINT64 AlignedDestinationBu
 	 oD3D12CommandListResolveQueryData(dCommandList, pQueryHeap, Type, StartIndex, NumQueries, pDestinationBuffer, AlignedDestinationBufferOffset);
 
 	 RecordStart
-	 MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	 MemStream *streamInstance = GetStreamFromThreadID();
 	 streamInstance->write(CommandEnum::CommandList_ResolveQueryData);
 	 RecordEnd
 
@@ -744,7 +744,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListSetPredication, ID3D12GraphicsCommandL
 	oD3D12CommandListSetPredication(dCommandList, pBuffer, AlignedBufferOffset, Operation);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetPredication);
 	RecordEnd
 
@@ -756,7 +756,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListSetMarker, ID3D12GraphicsCommandList *
 	oD3D12CommandListSetMarker(dCommandList, Metadata, pData, Size);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_SetMarker);
 	RecordEnd
 
@@ -768,7 +768,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListBeginEvent, ID3D12GraphicsCommandList 
 	oD3D12CommandListBeginEvent(dCommandList, Metadata, pData, Size);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_BeginEvent);
 	RecordEnd
 
@@ -781,7 +781,7 @@ DECLARE_FUNCTIONPTR(void, D3D12CommandListEndEvent, ID3D12GraphicsCommandList *d
 	oD3D12CommandListEndEvent(dCommandList);
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_EndEvent);
 	RecordEnd
 
@@ -799,7 +799,7 @@ ID3D12Resource *pArgumentBuffer, UINT64 ArgumentBufferOffset, ID3D12Resource *pC
 
 
 	RecordStart
-	MemStream *streamInstance = GetStreamFromPtr(dCommandList);
+	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ExecuteIndirect);
 	RecordEnd
 
