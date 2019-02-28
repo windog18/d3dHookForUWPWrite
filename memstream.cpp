@@ -26,7 +26,7 @@ void MemStream::writetoFile(const char* pname)
 	fopen_s(&f, pname, "ab");
 
 	fwrite(&streamcount, sizeof(INT64), 1, f);
-	fwrite(memhandle, streamcount, 1, f);
+	fwrite(&memhandle[0], streamcount, 1, f);
 
 	fclose(f);
 
@@ -48,7 +48,7 @@ void MemStream::readfromfile(const char* pname)
 
 	INT64 memcount = 0;
 	fread(&memcount, sizeof(INT64), 1, f);
-	fread(memhandle, memcount, 1, f);
+	fread(&memhandle[0], memcount, 1, f);
 
 	fclose(f);
 }
@@ -56,32 +56,30 @@ void MemStream::readfromfile(const char* pname)
 void MemStream::reset()
 {
 	streamcount = 0;
-	streamhandle = memhandle;
+	streamhandle = &memhandle[0];
 
 	nameListCache.clear();
 }
 
 MemStream::MemStream()
 {
-	memhandle = NULL;
+	memhandle.clear();
 
 }
 
 MemStream::~MemStream()
 {
-	if (memhandle != NULL) {
-		delete []memhandle;
-		memhandle = NULL;
-	}
+	memhandle.clear();
 
 }
 
 void MemStream::init()
 {
-	OutputDebugStringA("[2020] alloc new memStream!!!");
-	memhandle = new unsigned char[MaxDatasize];
+	Log_Detail_0(Enum_other1,"alloc new memStream!!!");
+	//memhandle = new unsigned char[MaxDatasize];
+	memhandle.resize(MaxDatasize);
 	streamcount = 0;
-	streamhandle = memhandle;
+	streamhandle = &memhandle[0];
 
 	nameListCache.clear();
 }
@@ -91,28 +89,32 @@ void MemStream::init()
 
 void MemStream::write(const void* pdata, size_t datasize)
 {
-	if (datasize + streamcount >= MaxDatasize) {
-		Log_Detail_0(Enum_other1, "error! out of range");
-		return;
-	}
-	memcpy((void*)streamhandle, pdata, datasize);
-
-	streamhandle = (unsigned char*)streamhandle + datasize;
-
-	streamcount += datasize;
+	WriteToMemStream(pdata, datasize);
+// 	if (datasize + streamcount >= MaxDatasize) {
+// 		memhandle.resize(memhandle.size() * 2);
+// 		
+// 		//Log_Detail_0(Enum_other1, "error! out of range");
+// 		return;
+// 	}
+// 	memcpy((void*)streamhandle, pdata, datasize);
+// 
+// 	streamhandle = (unsigned char*)streamhandle + datasize;
+// 
+// 	streamcount += datasize;
 }
 
 
 void MemStream::write(CommandEnum enu)
 {
 	int datasize = sizeof(CommandEnum);
-	if (datasize + streamcount >= MaxDatasize) {
-		Log_Detail_0(Enum_other1, "error! out of range");
-		return;
-	}
-	memcpy(streamhandle, &enu, datasize);
-	streamcount += sizeof(CommandEnum);
-	streamhandle = (unsigned char*)streamhandle + datasize;
+	WriteToMemStream(&enu, datasize);
+// 	if (datasize + streamcount >= MaxDatasize) {
+// 		Log_Detail_0(Enum_other1, "error! out of range");
+// 		return;
+// 	}
+// 	memcpy(streamhandle, &enu, datasize);
+// 	streamcount += sizeof(CommandEnum);
+// 	streamhandle = (unsigned char*)streamhandle + datasize;
 
 	std::string commandName = enum_to_string(enu);
 	commandName = commandName + "\n";

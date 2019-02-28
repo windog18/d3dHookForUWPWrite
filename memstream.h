@@ -17,7 +17,8 @@ class MemStream
 private:
 	//static MemStream* instance;
 	
-	unsigned char* memhandle;
+	//unsigned char* memhandle;
+	std::vector<unsigned char> memhandle;
 	unsigned char* streamhandle;
 
 	INT64 streamcount;
@@ -76,6 +77,16 @@ public:
 	void read(const void* pdata, size_t datasize);
 
 	
+
+	inline void WriteToMemStream(const void *src, size_t tSize) {
+		if (tSize + streamcount >= memhandle.size()) {
+			memhandle.resize(memhandle.size() * 2);
+			streamhandle = &memhandle[streamcount];
+		}
+		memcpy(streamhandle, src, tSize);
+		streamcount += tSize;
+		streamhandle += tSize;
+	}
 };
 
 
@@ -87,9 +98,11 @@ inline void MemStream::write(T &el)
 // 
 // 	OutputDebugStringA((prefix + t).c_str());
 	size_t datasize = sizeof(T);
-	memcpy(streamhandle, &el, datasize);
-	streamcount += datasize;
-	streamhandle  += datasize;
+// 	memcpy(streamhandle, &el, datasize);
+// 	streamcount += datasize;
+// 	streamhandle  += datasize;
+
+	WriteToMemStream(&el, datasize);
 }
 
 template <typename T>
@@ -100,9 +113,11 @@ inline void MemStream::write(T* el)
 // 	
 // 	OutputDebugStringA((prefix + t).c_str());
 	size_t datasize = sizeof(T*);
-	memcpy(streamhandle, &el, datasize);
-	streamcount += datasize;
-	streamhandle = streamhandle + datasize;
+// 	memcpy(streamhandle, &el, datasize);
+// 	streamcount += datasize;
+// 	streamhandle = streamhandle + datasize;
+	WriteToMemStream(&el, datasize);
+
 }
 
 template <typename T>

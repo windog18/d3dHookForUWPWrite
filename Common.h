@@ -80,14 +80,14 @@ inline void ResetRecordState()
 }
 
 inline void BeginRecord() {
-	OutputDebugStringA("Begin to RecordData");
+	Log_Detail_0(Enum_other1, "Begin to RecordData");
 	ResetRecordState();
 	g_beginRecord = true;
 }
 
 
 inline void EndRecord() {
-	OutputDebugStringA("Stop RecordData");
+	Log_Detail_0(Enum_other1, "Stop RecordData");
 	//ResetRecordState();
 	g_beginRecord = false;
 }
@@ -122,9 +122,9 @@ inline void ToggleRecordState() {
 	g_beginRecord = false;
 	
 	if (GlobalGathering::GetInstance()->IsRecording())
-		OutputDebugStringA("Begin RecordData");
+		Log_Detail_0(Enum_other1, "Begin RecordData");
 	else {
-		OutputDebugStringA("Stop to RecordData");
+		Log_Detail_0(Enum_other1,"Stop to RecordData");
 	}
 	ResetRecordState();
 }

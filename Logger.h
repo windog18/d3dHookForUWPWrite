@@ -133,29 +133,29 @@ private:
 // }
 
 #define LOG_DEVICE(logType, fmt, ...) \
-	Logger::Log(Enum_Device, logType, fmt,__VA_ARGS__);
+	Logger::Log(Enum_Device, logType, fmt,__VA_ARGS__)
 
 #define Log_COMMANDLIST(logType, fmt, ...) \
-	Logger::Log(Enum_CommandList, LogType, fmt,__VA_ARGS__);
+	Logger::Log(Enum_CommandList, LogType, fmt,__VA_ARGS__)
 
 #define Log_Resource(logType, fmt,...) \
-	Logger::Log(Enum_Resource, LogType, fmt, __VA_ARGS__);
+	Logger::Log(Enum_Resource, LogType, fmt, __VA_ARGS__)
 
 
 #define Log_Detail_0(EnumType, fmt, ...) \
-	Logger::Log(EnumType, LogType_Detail_0, fmt, __VA_ARGS__);
+	Logger::Log(EnumType, LogType_Detail_0, fmt, __VA_ARGS__)
 
 #define  Log_Detail_1(EnumType, fmt, ...) \
-	Logger::Log(EnumType, LogType_Detail_1 , fmt, __VA_ARGS__);
+	Logger::Log(EnumType, LogType_Detail_1 , fmt, __VA_ARGS__)
 
 #define Log_Detail_2(EnumType, fmt, ...) \
-	Logger::Log(EnumType, LogType_Detail_2, fmt, __VA_ARGS__);
+	Logger::Log(EnumType, LogType_Detail_2, fmt, __VA_ARGS__)
 
 #define Log_Full(...) \
 	Logger::Log(...)
 
 #define Log_Simple(fmt,...) \
-	Logger::Log(Enum_All, LogType_Detail_0, fmt,__VA_ARGS__);
+	Logger::Log(Enum_All, LogType_Detail_0, fmt,__VA_ARGS__)
 
 
 inline void Log(std::string res) {

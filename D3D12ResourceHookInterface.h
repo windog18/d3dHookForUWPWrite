@@ -98,18 +98,18 @@ DECLARE_FUNCTIONPTR(void, D3D12ResourceUnmap, ID3D12Resource *dResource, UINT su
 
 	//write the real data
 	streaminstance->write(desc.Dimension);
-	if (desc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
-	{
-		size_t buffersize = desc.Width;
-		streaminstance->write(buffersize);
-		streaminstance->write(ResourceTempData::GetTempMapData(GetCurrentThreadId()), buffersize);
-	}
-	else if (desc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D)
-	{
-		size_t texsize = desc.Width;
-		//size_t texsize = desc.Width*desc.Height * 4;
-		//streaminstance->write(pTemp, texsize);
-	}
+// 	if (desc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+// 	{
+// 		size_t buffersize = desc.Width;
+// 		streaminstance->write(buffersize);
+// 		streaminstance->write(ResourceTempData::GetTempMapData(GetCurrentThreadId()), buffersize);
+// 	}
+// 	else if (desc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D)
+// 	{
+// 		size_t texsize = desc.Width;
+// 		//size_t texsize = desc.Width*desc.Height * 4;
+// 		//streaminstance->write(pTemp, texsize);
+// 	}
 	RecordEnd
 }
 

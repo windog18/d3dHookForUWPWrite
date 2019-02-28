@@ -489,7 +489,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, LPVOID)
 		{
 			const std::string error_prefix("error code_syl: ");
 			const std::string ErrorMessage(ErrorCode.message());
-			OutputDebugStringA((error_prefix + ErrorMessage).c_str());
+			Log_Simple((error_prefix + ErrorMessage).c_str());
+			//OutputDebugStringA((error_prefix + ErrorMessage).c_str());
 		}
 		DisableThreadLibraryCalls(hInstance);
 		GetModuleFileNameA(hInstance, dlldir, 512);

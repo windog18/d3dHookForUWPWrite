@@ -6,6 +6,7 @@
 #include <map>
 #include <mutex>
 #include <sstream>
+#include "Logger.h"
 
 class MemStream;
 
@@ -74,7 +75,7 @@ public:
 				std::stringstream ss;
 				ss << "recording state changed: ";
 				ss << recordState;
-				OutputDebugStringA(ss.str().c_str());
+				Log_Detail_0(Enum_other1, ss.str().c_str());
 				//OutputDebugStringA("start recording");
 			}
 			m_isRecording = recordState;
