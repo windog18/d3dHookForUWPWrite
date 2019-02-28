@@ -3,7 +3,7 @@
 
 
 
-const int MaxDatasize = 1024 * 1024 * 1024;
+const int MaxDatasize = 10 * 1024 * 1024;
 
 const int MaxCallSequenceSize = 1024 * 1024 * 1024;
 
@@ -23,7 +23,7 @@ const int MaxCallSequenceSize = 1024 * 1024 * 1024;
 void MemStream::writetoFile(const char* pname)
 {
 	FILE *f;
-	fopen_s(&f, pname, "wb");
+	fopen_s(&f, pname, "ab");
 
 	fwrite(&streamcount, sizeof(INT64), 1, f);
 	fwrite(memhandle, streamcount, 1, f);
@@ -35,7 +35,7 @@ void MemStream::writetoFile(const char* pname)
 void MemStream::writeCommandNameToFile(const char * pname)
 {
 
-	ofstream fout(pname);
+	ofstream fout(pname,ios::app);
 	fout << nameListCache.str();
 }
 
@@ -70,7 +70,7 @@ MemStream::MemStream()
 MemStream::~MemStream()
 {
 	if (memhandle != NULL) {
-		delete memhandle;
+		delete []memhandle;
 		memhandle = NULL;
 	}
 

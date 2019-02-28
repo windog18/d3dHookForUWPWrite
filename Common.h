@@ -86,10 +86,10 @@ MH_CreateHook(methodVirtualPtr, hk##DFunctionName, (LPVOID*)&o##DFunctionName)\
 
 
 extern bool g_beginRecord;
-extern bool g_record;
+
 
 #define RecordStart \
-	if( g_record ) \
+	if( GlobalGathering::GetInstance()->IsRecording() ) \
 	 {\
 
 #define RecordEnd \
@@ -125,25 +125,32 @@ inline void ResetRecordState()
 }
 
 inline void BeginRecord() {
-	//OutputDebugStringA("Begin to RecordData");
+	OutputDebugStringA("Begin to RecordData");
 	ResetRecordState();
 	g_beginRecord = true;
 }
 
 
+inline void EndRecord() {
+	OutputDebugStringA("Stop RecordData");
+	ResetRecordState();
+	g_beginRecord = false;
+}
+
+
 inline void ToggleRecordState() {
 	if (g_beginRecord) {
-		g_record = true;
+		GlobalGathering::GetInstance()->SetRecording(true);
 	}
 	else {
-		g_record = false;
+		GlobalGathering::GetInstance()->SetRecording(false);
 	}
 	g_beginRecord = false;
 	
-	if (g_record)
-		OutputDebugStringA("Stop RecordData");
+	if (GlobalGathering::GetInstance()->IsRecording())
+		OutputDebugStringA("Begin RecordData");
 	else {
-		OutputDebugStringA("Begin to RecordData");
+		OutputDebugStringA("Stop to RecordData");
 	}
 	ResetRecordState();
 }

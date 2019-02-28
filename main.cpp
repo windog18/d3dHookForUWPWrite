@@ -9,9 +9,9 @@
 #include "D3D12DeviceHookInterface.h"
 #include <d3d11.h>
 #include "./FW1FontWrapper/FW1FontWrapper.h"
-
+#include <thread>
 bool g_beginRecord = false;
-bool g_record = false;
+
 //=========================================================================================================================// D3D12 HOOKS 
 // D3D12 HOOKS Example
 
@@ -80,7 +80,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ExecuteCommandLists, ID3D12CommandQueue * dComman
 
 long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	//Log_WithThreadID("[d3d12]present be called");
+	Log_WithThreadID("[d3d12]present be called");
 	if (InitOnce)
 	{
 		
@@ -147,12 +147,25 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 
 	}
 	
-	
-	if (g_beginRecord || g_record) {
-		if (g_record) {
-			GlobalGathering::GetInstance()->WriteAllBufferToResult();
+	bool recordState = GlobalGathering::GetInstance()->IsRecording();
+	static int count = 0;
+	if (g_beginRecord || recordState) {
+// 		if (recordState && count == 2) {
+// 			GlobalGathering::GetInstance()->WriteAllBufferToResult();
+// 			ResetRecordState();
+// 		}
+
+		if (!g_beginRecord && recordState) {
+			//GlobalGathering::GetInstance()->WriteAllBufferToResult();
+			ResetRecordState();
 		}
-		ToggleRecordState();
+		GlobalGathering::GetInstance()->SetRecording(g_beginRecord);
+		OutputDebugStringA("dsfsdfsfsfsdfs");
+// 		if (count == 2) {
+// 			ToggleRecordState();
+// 			count = 0;
+// 		}
+		//count = count + 1;
 	}
 
 	
@@ -265,6 +278,7 @@ LRESULT WINAPI DetourWindowProc(
 
  LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	 Log_WithThreadID(__FUNCTION__);
 // 	 if (msg != 132 && msg != 32 && msg != 675) {
 // 		 stringstream ss;
 // 		 ss << msg;
@@ -273,7 +287,11 @@ LRESULT WINAPI DetourWindowProc(
 // 	 }
 
 	 if (msg == 77) { //F1
-		 BeginRecord();
+		 if(!g_beginRecord)
+			BeginRecord();
+		 else {
+		    EndRecord();
+		 }
 	 }
 
 	 switch (msg)
@@ -422,8 +440,8 @@ int dx12Thread()
 
 		MH_Initialize();
 
- 		CreateHookD3D12CommandListInterface(dx12::getMethodsTable());
- 		CreateHookD3D12ResourceInterface(dx12::getMethodsTable());
+ 		//CreateHookD3D12CommandListInterface(dx12::getMethodsTable());
+ //		CreateHookD3D12ResourceInterface(dx12::getMethodsTable());
 // 		
  		CreateHookD3D12DeviceInterface(dx12::getMethodsTable());
 

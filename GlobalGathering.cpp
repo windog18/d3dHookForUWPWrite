@@ -128,17 +128,20 @@ MemStream * GlobalGathering::GetOrCreateMemStream(DWORD threadID)
 
 MemStream * GlobalGathering::GetOrCreateMemStreamForPtr(void * ptr)
 {
+	std::pair<void *, DWORD> pairVal = std::make_pair(ptr, GetCurrentThreadId());
 	std::lock_guard<std::mutex> guard(m_sMutex);
-	if (m_sCommandRecordMemStreamMap.find(ptr) == m_sCommandRecordMemStreamMap.end()) {
+	if (m_sCommandRecordMemStreamMap.find(pairVal) == m_sCommandRecordMemStreamMap.end()) {
 		MemStream *memStream = new MemStream();
 		memStream->init();
-		m_sCommandRecordMemStreamMap.insert(std::make_pair(ptr, memStream));
+		m_sCommandRecordMemStreamMap.insert(std::make_pair(pairVal, memStream));
 	}
-	return m_sCommandRecordMemStreamMap[ptr];
+	return m_sCommandRecordMemStreamMap[pairVal];
 }
 
 void GlobalGathering::WriteAllBufferToResult()
 {
+	
+	std::lock_guard<std::mutex> guard(m_sMutex);
 	fs::path basePath = fs::path(UWP::Current::Storage::GetTemporaryPath()) / L"DUMP";
 	for (std::map<DWORD, MemStream *>::iterator it = m_sRecordMemStreamMap.begin(); it != m_sRecordMemStreamMap.end(); it++)
 	{
@@ -161,14 +164,27 @@ void GlobalGathering::WriteAllBufferToResult()
 	}
 
 
-	for (std::map<void *, MemStream *>::iterator it = m_sCommandRecordMemStreamMap.begin(); it != m_sCommandRecordMemStreamMap.end(); it++)
+	for (std::map<std::pair<void *, DWORD>, MemStream *>::iterator it = m_sCommandRecordMemStreamMap.begin(); it != m_sCommandRecordMemStreamMap.end(); it++)
 	{
 		wstringstream wss;
 		wss << "RecordData_";
-		wss << it->first;
+		wss << it->first.second;
+
+
 		std::error_code ErrorCode;
-		fs::path writePath = basePath / wss.str() / L"recordDataCommandOnly.bin";
-		fs::path writeNamePath = basePath / wss.str() / L"recordDataCommandOnly_name.txt";
+
+		wstringstream nameStream;
+		nameStream << it->first.first;
+		nameStream << "_recordDataCommandOnly.bin";
+		fs::path writePath = basePath / wss.str() / nameStream.str();
+
+		nameStream.str(L"");
+		nameStream.clear();
+		nameStream << it->first.first;
+		nameStream << "_recordDataCommandOnly_name.txt";
+		fs::path writeNamePath = basePath / wss.str() / nameStream.str();
+		//OutputDebugStringW(writePath.c_str());
+		//OutputDebugStringW(writeNamePath.c_str());
 		if (fs::create_directories(writePath.parent_path(), ErrorCode) == false && ErrorCode) {
 			Log("could not create path at: " + narrow(writePath.c_str()));
 		}
@@ -196,7 +212,7 @@ void GlobalGathering::ResetRecordState()
 
 
 	if (m_sCommandRecordMemStreamMap.size() > 0) {
-		for (std::map<void *, MemStream *>::iterator it = m_sCommandRecordMemStreamMap.begin(); it != m_sCommandRecordMemStreamMap.end(); it++) {
+		for (std::map<std::pair<void *, DWORD>, MemStream *>::iterator it = m_sCommandRecordMemStreamMap.begin(); it != m_sCommandRecordMemStreamMap.end(); it++) {
 			delete it->second;
 		}
 		m_sCommandRecordMemStreamMap.clear();

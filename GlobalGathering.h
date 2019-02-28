@@ -57,6 +57,22 @@ public:
 	MemStream *GetOrCreateMemStream(DWORD threadID);
 	MemStream *GetOrCreateMemStreamForPtr(void *ptr);
 
+	inline bool IsRecording() {
+		bool recordState = false;
+		{
+			std::lock_guard<std::mutex> lock(m_recordMutex);
+			recordState = m_isRecording;
+		}
+		return recordState;
+	}
+
+	inline void SetRecording(bool recordState) {
+		{
+			std::lock_guard<std::mutex> lock(m_recordMutex);
+			m_isRecording = recordState;
+		}
+	}
+
 
 	void WriteAllBufferToResult();
 	void ResetRecordState();
@@ -79,8 +95,12 @@ private:
 
 
 	std::map<DWORD, MemStream *> m_sRecordMemStreamMap;
-	std::map<void *, MemStream *> m_sCommandRecordMemStreamMap;
+	std::map<std::pair<void *,DWORD >, MemStream *> m_sCommandRecordMemStreamMap;
 
 	std::mutex m_sMutex;
+
+
+	bool m_isRecording;
+	std::mutex m_recordMutex;
 };
 
