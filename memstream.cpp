@@ -92,7 +92,8 @@ void MemStream::init()
 void MemStream::write(const void* pdata, size_t datasize)
 {
 	if (datasize + streamcount >= MaxDatasize) {
-		OutputDebugStringA("[2020] error! out of range");
+		Log_Detail_0(Enum_other1, "error! out of range");
+		return;
 	}
 	memcpy((void*)streamhandle, pdata, datasize);
 
@@ -104,10 +105,14 @@ void MemStream::write(const void* pdata, size_t datasize)
 
 void MemStream::write(CommandEnum enu)
 {
-
-	memcpy(streamhandle, &enu, sizeof(CommandEnum));
+	int datasize = sizeof(CommandEnum);
+	if (datasize + streamcount >= MaxDatasize) {
+		Log_Detail_0(Enum_other1, "error! out of range");
+		return;
+	}
+	memcpy(streamhandle, &enu, datasize);
 	streamcount += sizeof(CommandEnum);
-	streamhandle = (unsigned char*)streamhandle + sizeof(CommandEnum);
+	streamhandle = (unsigned char*)streamhandle + datasize;
 
 	std::string commandName = enum_to_string(enu);
 	commandName = commandName + "\n";

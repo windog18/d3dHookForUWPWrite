@@ -432,7 +432,7 @@ HINSTANCE g_instanceID = NULL;
 
 int dx12Thread()
 {
-	Logger::SetLogLevel(LogType_All, Enum_All);
+	Logger::SetLogLevel(LogType_Detail_0 | LogType_Detail_1, Enum_All);
 	if (dx12::init(dx12::RenderType::D3D12) == dx12::Status::Success)
 	{
 

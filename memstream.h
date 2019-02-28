@@ -18,6 +18,7 @@ private:
 	//static MemStream* instance;
 	
 	unsigned char* memhandle;
+	std::vector<unsigned char *>memHandle;
 	unsigned char* streamhandle;
 
 	INT64 streamcount;

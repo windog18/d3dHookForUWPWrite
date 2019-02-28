@@ -68,7 +68,7 @@ const std::wstring DumpPath = fs::path(UWP::Current::Storage::GetTemporaryPath()
 
 class Logger {
 public:
-	static void SetLogLevel(LogType type,LogFunEnumType enumType) {
+	static void SetLogLevel(int type,int enumType) {
 		m_sLogType = type;
 		m_sEnumType = enumType;
 	}
@@ -100,8 +100,8 @@ public:
 	}
 private: 
 	static std::string m_sLogPrefix;
-	static LogType m_sLogType;
-	static LogFunEnumType m_sEnumType;
+	static int m_sLogType;
+	static int m_sEnumType;
 };
 
 
