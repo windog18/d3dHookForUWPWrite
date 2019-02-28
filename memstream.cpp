@@ -3,7 +3,7 @@
 
 
 
-const int MaxDatasize = 1024 * 1024 * 1024;
+const int MaxDatasize = 100 * 1024 * 1024;
 
 const int MaxCallSequenceSize = 1024 * 1024 * 1024;
 
@@ -78,7 +78,7 @@ MemStream::~MemStream()
 
 void MemStream::init()
 {
-
+	OutputDebugStringA("[2020] alloc new memStream!!!");
 	memhandle = new unsigned char[MaxDatasize];
 	streamcount = 0;
 	streamhandle = memhandle;
@@ -91,6 +91,9 @@ void MemStream::init()
 
 void MemStream::write(const void* pdata, size_t datasize)
 {
+	if (datasize + streamcount >= MaxDatasize) {
+		OutputDebugStringA("[2020] error! out of range");
+	}
 	memcpy((void*)streamhandle, pdata, datasize);
 
 	streamhandle = (unsigned char*)streamhandle + datasize;

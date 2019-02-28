@@ -17,62 +17,17 @@ namespace fs = std::experimental::filesystem;
 #include <sstream> 
 #include <string>
 #include <vector>
+#include "Logger.h"
 #include "GlobalGathering.h"
 
-inline std::string narrow(std::wstring const& text)
-{
-	std::locale const loc("");
-	wchar_t const* from = text.c_str();
-	std::size_t const len = text.size();
-	std::vector<char> buffer(len + 1);
-	std::use_facet<std::ctype<wchar_t> >(loc).narrow(from, from + len, '_', &buffer[0]);
-	return std::string(&buffer[0], &buffer[len]);
-}
+
 //=========================================================================================================================//
 
 #include <fstream>
 using namespace std;
 
-const std::wstring DumpPath = fs::path(UWP::Current::Storage::GetTemporaryPath()) / L"DUMP" / L"log_hello_2019_syl.txt";
-inline void Log(const char *fmt, ...)
-{
-	if (!fmt)	return;
 
 
-
-	char		text[4096];
-	va_list		ap;
-	va_start(ap, fmt);
-	vsprintf_s(text, fmt, ap);
-	va_end(ap);
-	OutputDebugStringA(text);
-	return;
-	//ofstream logfile(GetDirectoryFile((PCHAR)"log.txt"), ios::app);
-	//LPCSTR str = const_cast<LPCSTR>(DumpPath.c_str());
-	//OutputDebugStringA(narrow(DumpPath).c_str());
-
-	ofstream logfile(narrow(DumpPath), ios::app);
-	if (logfile.is_open() && text)	logfile << text << endl;
-	logfile.close();
-}
-
-inline void Log(std::string inputStr) {
-	Log(inputStr.c_str());
-}
-
-inline void Log_WithThreadID(std::string inputStr) {
-	stringstream ss;
-	ss << GetCurrentThreadId();
-	inputStr = ss.str() + " " + inputStr;
-	Log(inputStr.c_str());
-}
-
-#define  LOG_ONCE(...)\
-static bool once = false;\
-if(once == false){\
-		once = true; \
-		Log_WithThreadID(__VA_ARGS__); \
-}\
 
 #define DECLARE_FUNCTIONPTR(DReturnType,DFunctionName,...) \
 typedef DReturnType(__stdcall* DFunctionName)(__VA_ARGS__);\
@@ -133,7 +88,7 @@ inline void BeginRecord() {
 
 inline void EndRecord() {
 	OutputDebugStringA("Stop RecordData");
-	ResetRecordState();
+	//ResetRecordState();
 	g_beginRecord = false;
 }
 

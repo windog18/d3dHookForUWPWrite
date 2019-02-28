@@ -169,6 +169,7 @@
     <ClCompile Include="FW1FontWrapper\FW1FontWrapper.cpp" />
     <ClCompile Include="FW1FontWrapper\FW1Precompiled.cpp" />
     <ClCompile Include="GlobalGathering.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memstream.cpp" />
     <ClCompile Include="Minhook\src\buffer.c" />
@@ -203,6 +204,7 @@
     <ClInclude Include="FW1FontWrapper\FW1FontWrapper.h" />
     <ClInclude Include="FW1FontWrapper\FW1Precompiled.h" />
     <ClInclude Include="GlobalGathering.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="memstream.h" />
     <ClInclude Include="Minhook\src\buffer.h" />

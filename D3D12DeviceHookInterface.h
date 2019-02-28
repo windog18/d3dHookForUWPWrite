@@ -298,7 +298,7 @@ const D3D12_DEPTH_STENCIL_VIEW_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDesc
 
 DECLARE_FUNCTIONPTR(void, D3D12CreateSampler, ID3D12Device *dDevice, const D3D12_SAMPLER_DESC *pDesc, D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) //22
 {
-	Log_WithThreadID(__FUNCTION__);
+	Log_Simple(__FUNCTION__);
 	oD3D12CreateSampler(dDevice, pDesc, DestDescriptor);
 
 	RecordStart

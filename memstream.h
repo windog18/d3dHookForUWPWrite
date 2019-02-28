@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "stdio.h"
 #include "xdefine.h"
+#include <sstream>
 
 
 
@@ -81,6 +82,10 @@ public:
 template <typename T>
 inline void MemStream::write(T &el)
 {
+// 	std::string t = typeid(T).name();
+// 	std::string prefix = "[2020]  write T: ";
+// 
+// 	OutputDebugStringA((prefix + t).c_str());
 	size_t datasize = sizeof(T);
 	memcpy(streamhandle, &el, datasize);
 	streamcount += datasize;
@@ -90,6 +95,10 @@ inline void MemStream::write(T &el)
 template <typename T>
 inline void MemStream::write(T* el)
 {
+// 	std::string t = typeid(T).name();
+// 	std::string prefix = "[2020]  write T*: ";
+// 	
+// 	OutputDebugStringA((prefix + t).c_str());
 	size_t datasize = sizeof(T*);
 	memcpy(streamhandle, &el, datasize);
 	streamcount += datasize;
@@ -99,6 +108,10 @@ inline void MemStream::write(T* el)
 template <typename T>
 inline void MemStream::writePointerValue(T *el)
 {
+// 	std::string t = typeid(T).name();
+// 	std::string prefix = "[2020]  writePointerValue: ";
+// 
+// 	OutputDebugStringA((prefix + t).c_str());
 	bool isnullpointer;
 	if (el == nullptr)
 	{

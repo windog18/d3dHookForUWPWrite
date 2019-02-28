@@ -119,9 +119,12 @@ MemStream * GlobalGathering::GetOrCreateMemStream(DWORD threadID)
 {
 	std::lock_guard<std::mutex> guard(m_sMutex);
 	if (m_sRecordMemStreamMap.find(threadID) == m_sRecordMemStreamMap.end()) {
+		Log_Detail_0(Enum_other1,"alloc new memStream for newThread %d", threadID);
 		MemStream *memStream = new MemStream();
 		memStream->init();
 		m_sRecordMemStreamMap.insert(std::make_pair(threadID, memStream));
+		Log_Detail_0(Enum_other1, "total record memStreamSize: %d",m_sRecordMemStreamMap.size());
+
 	}
 	return m_sRecordMemStreamMap[threadID];
 }
@@ -140,8 +143,10 @@ MemStream * GlobalGathering::GetOrCreateMemStreamForPtr(void * ptr)
 
 void GlobalGathering::WriteAllBufferToResult()
 {
-	
 	std::lock_guard<std::mutex> guard(m_sMutex);
+
+	int count = m_sRecordMemStreamMap.size();
+	Log_Detail_0(Enum_other1, "total dump files count: %d", count);
 	fs::path basePath = fs::path(UWP::Current::Storage::GetTemporaryPath()) / L"DUMP";
 	for (std::map<DWORD, MemStream *>::iterator it = m_sRecordMemStreamMap.begin(); it != m_sRecordMemStreamMap.end(); it++)
 	{
