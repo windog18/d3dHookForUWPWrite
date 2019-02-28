@@ -27,7 +27,7 @@ GlobalGathering::GlobalGathering()
 	m_commandQueue = NULL;
 	m_commandAllocator = NULL;
 
-
+	m_isRecording = false;
 	m_drawD3D11Device = NULL;
 	m_drawD3D11DeviceContext = NULL;
 
