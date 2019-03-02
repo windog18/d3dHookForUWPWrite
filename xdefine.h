@@ -119,6 +119,7 @@ enum CommandEnum
 	Resource_Map,
 	Resource_Unmap,
 	Resource_GetGPUVirtualAddress,
+		last_frame,
 		end_frame,
 		end_File,
 
@@ -166,7 +167,7 @@ inline const char *enum_to_string(CommandEnum t) {
 	case Device_CreateConstantBufferView:
 		return "Device_CreateConstantBufferView";
 	case Device_CreateShaderResourceView:
-		return "Device_CreateConstantBufferView";
+		return "Device_CreateShaderResourceView";
 	case Device_CreateUnorderedAccessView:
 		return "Device_CreateUnorderedAccessView";
 	case Device_CreateRenderTargetView:
@@ -352,7 +353,8 @@ inline const char *enum_to_string(CommandEnum t) {
 	case Resource_GetGPUVirtualAddress:
 		return "Resource_GetGPUVirtualAddress";
 	case end_frame:
-		break;
+		return "end_frame";
+
 	case forcedw:
 		break;
 	default:

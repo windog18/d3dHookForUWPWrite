@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <experimental/filesystem>
+#include <mutex>
 #include "UWP.hpp"
 using namespace std;
 namespace fs = std::experimental::filesystem;
@@ -163,10 +164,15 @@ inline void Log(std::string res) {
 }
 
 #define LOG_ONCE(...)\
+static std::mutex tMutex; \
 static bool once = false;\
-if(once == false){\
+{ \
+std::lock_guard<std::mutex> lock(tMutex); \
+if (once == false) {\
+	\
 		once = true; \
-		Logger::Log(Enum_All, LogType_Detail_0,__VA_ARGS__); \
+		Logger::Log(Enum_All, LogType_Detail_0, __VA_ARGS__); \
+} \
 }
 
 // inline void Log(std::string inputStr) {

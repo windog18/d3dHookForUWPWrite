@@ -1,6 +1,6 @@
 
 #include "memstream.h"
-
+#include "GlobalGathering.h"
 
 
 const int MaxDatasize = 10 * 1024 * 1024;
@@ -61,6 +61,8 @@ void MemStream::reset()
 	nameListCache.clear();
 }
 
+
+
 MemStream::MemStream()
 {
 	memhandle.clear();
@@ -89,6 +91,7 @@ void MemStream::init()
 
 void MemStream::write(const void* pdata, size_t datasize)
 {
+
 	WriteToMemStream(pdata, datasize);
 // 	if (datasize + streamcount >= MaxDatasize) {
 // 		memhandle.resize(memhandle.size() * 2);
@@ -106,6 +109,7 @@ void MemStream::write(const void* pdata, size_t datasize)
 
 void MemStream::write(CommandEnum enu)
 {
+
 	int datasize = sizeof(CommandEnum);
 	WriteToMemStream(&enu, datasize);
 // 	if (datasize + streamcount >= MaxDatasize) {
@@ -115,13 +119,46 @@ void MemStream::write(CommandEnum enu)
 // 	memcpy(streamhandle, &enu, datasize);
 // 	streamcount += sizeof(CommandEnum);
 // 	streamhandle = (unsigned char*)streamhandle + datasize;
-
+	std::lock_guard<std::mutex> locker(m_gMutex);
 	std::string commandName = enum_to_string(enu);
 	commandName = commandName + "\n";
 	
 	nameListCache << commandName;
 }
 
+void MemStream::write(D3D12_CPU_DESCRIPTOR_HANDLE& handle, ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE typ)
+{
+#ifndef REPLAY
+	UINT offsetsize = device->GetDescriptorHandleIncrementSize(typ);
+
+	ID3D12DescriptorHeap* heap = ResourceTempData<UINT64, ID3D12DescriptorHeap *,0>::GetTempMapData(handle.ptr); //XD3D12DescriptorHeap::m_handlemap1[handle.ptr];
+	INT64 ptr = handle.ptr;
+	UINT offset = 0;
+
+	while (heap == NULL && ptr > 0)
+	{
+		if (offset > 100) {
+			break;
+		}
+		ptr -= offsetsize;
+		offset++;
+		heap = ResourceTempData<UINT64, ID3D12DescriptorHeap *, 0>::GetTempMapData(handle.ptr); //XD3D12DescriptorHeap::m_handlemap1[ptr];
+	}
+
+	if (heap == NULL) {
+		offset = 0;
+		Log_Detail_1(Enum_other1, "not found desc Heap");
+	}
+	else {
+		Log_Detail_1(Enum_other1, "found desc Heap %d",heap);
+	}
+
+	write(heap);
+	write(offset);
+#endif
+
+
+}
 
 
 
@@ -141,7 +178,7 @@ void MemStream::write(const D3D12_INPUT_LAYOUT_DESC& desc)
 
 	write(desc.NumElements);
 
-	for (int i = 0; i < desc.NumElements; i++)
+	for (UINT i = 0; i < desc.NumElements; i++)
 	{
 		size_t lent = strlen(desc.pInputElementDescs[i].SemanticName);
 
@@ -155,6 +192,32 @@ void MemStream::write(const D3D12_INPUT_LAYOUT_DESC& desc)
 		write(desc.pInputElementDescs[i].InputSlotClass);
 		write(desc.pInputElementDescs[i].InstanceDataStepRate);
 
+	}
+}
+
+void MemStream::read(D3D12_COMMAND_SIGNATURE_DESC& desc)
+{
+	read(desc.ByteStride);
+	read(desc.NodeMask);
+	read(desc.NumArgumentDescs);
+	desc.pArgumentDescs = new D3D12_INDIRECT_ARGUMENT_DESC[desc.NumArgumentDescs];
+	for (UINT i = 0; i < desc.NumArgumentDescs; i++)
+	{
+		read(desc.pArgumentDescs[i]);
+	}
+
+}
+
+void MemStream::write(const D3D12_COMMAND_SIGNATURE_DESC& desc)
+{
+
+	write(desc.ByteStride);
+	write(desc.NodeMask);
+	write(desc.NumArgumentDescs);
+
+	for (UINT i = 0; i < desc.NumArgumentDescs; i++)
+	{
+		write(desc.pArgumentDescs[i]);
 	}
 }
 
@@ -183,6 +246,97 @@ void MemStream::write(const D3D12_STREAM_OUTPUT_DESC& desc)
 	}
 	write(desc.RasterizedStream);
 }
+
+void MemStream::write(const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc)
+{
+	write(desc.pRootSignature);
+
+	write(desc.Flags);
+
+	write(desc.NodeMask);
+
+	size_t psosize = desc.CachedPSO.CachedBlobSizeInBytes;
+
+	write(psosize);
+
+	write(desc.CachedPSO.pCachedBlob, psosize);
+
+	size_t codesize = desc.CS.BytecodeLength;
+
+	write(codesize);
+
+	write(desc.CS.pShaderBytecode, codesize);
+
+}
+
+void MemStream::write(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc)
+{
+	write(desc.pRootSignature);
+
+	write(desc.BlendState);
+
+	size_t psosize = desc.CachedPSO.CachedBlobSizeInBytes;
+
+	write(psosize);
+
+	write(desc.CachedPSO.pCachedBlob, psosize);
+
+	write(desc.DepthStencilState);
+
+	size_t codesize = desc.DS.BytecodeLength;
+
+	write(codesize);
+
+	write(desc.DS.pShaderBytecode, codesize);
+
+	write(desc.DSVFormat);
+
+	write(desc.Flags);
+
+	codesize = desc.GS.BytecodeLength;
+	write(codesize);
+
+	write(desc.GS.pShaderBytecode, codesize);
+	codesize = desc.HS.BytecodeLength;
+
+	codesize = desc.HS.BytecodeLength;
+	write(codesize);
+	write(desc.HS.pShaderBytecode, codesize);
+
+	write(desc.IBStripCutValue);
+
+	write(desc.InputLayout);
+
+	write(desc.NodeMask);
+
+	write(desc.NumRenderTargets);
+
+	write(desc.PrimitiveTopologyType);
+
+	codesize = desc.PS.BytecodeLength;
+
+	write(codesize);
+
+	write(desc.PS.pShaderBytecode, codesize);
+
+	write(desc.RasterizerState);
+
+	write(desc.RTVFormats, 8 * sizeof(DXGI_FORMAT));
+
+	write(desc.SampleDesc);
+
+	write(desc.SampleMask);
+
+	write(desc.StreamOutput);
+
+	codesize = desc.VS.BytecodeLength;
+
+	write(codesize);
+
+	write(desc.VS.pShaderBytecode, codesize);
+}
+
+
 
 void MemStream::read( D3D12_STREAM_OUTPUT_DESC& desc)
 {
@@ -286,7 +440,7 @@ void MemStream::read(D3D12_INPUT_LAYOUT_DESC& desc)
 
 	desc.pInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[desc.NumElements];
 
-	for (int i = 0; i < desc.NumElements; i++)
+	for (UINT i = 0; i < desc.NumElements; i++)
 	{
 		size_t lent;
 

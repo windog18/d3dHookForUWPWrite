@@ -7,10 +7,11 @@
 #include <mutex>
 #include <sstream>
 #include "Logger.h"
+#include "xdefine.h"
 
 class MemStream;
-
-template<typename Key, typename Value>
+#define MEMMAP_COUNT 2
+template<typename Key, typename Value ,int N=0>
 class ResourceTempData {
 public:
 	
@@ -20,8 +21,8 @@ public:
 	}
 
 
-	static void* GetTempMapData(Key threadID) {
-		void *ptr = NULL;
+	static Value GetTempMapData(Key threadID) {
+		Value ptr = NULL;
 		{
 			std::lock_guard<std::mutex> lock(m_sMutex);
 			if (m_sTempMap.find(threadID) != m_sTempMap.end())
@@ -39,6 +40,12 @@ private:
 
 	static std::mutex m_sMutex;
 };
+
+
+#define IMPLEMENT_RESOURCE_DATA(Key, Value, N0) \
+std::map<Key, Value> ResourceTempData<Key, Value,N0>::m_sTempMap; \
+std::mutex ResourceTempData<Key, Value,N0>::m_sMutex;
+
 
 
 void ResetRecordState();
@@ -59,6 +66,9 @@ public:
 	
 	MemStream *GetOrCreateMemStream(DWORD threadID);
 	MemStream *GetOrCreateMemStreamForPtr(void *ptr);
+
+	void SetFrameTagForAll(CommandEnum Tag);
+	void SwitchMemMapIdx(int idx);
 
 	inline bool IsRecording() {
 		bool recordState = false;
@@ -89,10 +99,6 @@ public:
 	void ResetRecordState();
 
 
-	ID3D12Device *GetDevice(int idx);
-
-
-
 	ID3D12CommandList *m_commandList;
 	ID3D12CommandAllocator *m_commandAllocator;
 	ID3D12CommandQueue *m_commandQueue;
@@ -105,12 +111,14 @@ private:
 	std::vector<ID3D12CommandQueue *> m_sCommandQueueMap;
 
 
-	std::map<DWORD, MemStream *> m_sRecordMemStreamMap;
+	std::map<DWORD, MemStream *> m_sRecordMemStreamMap[MEMMAP_COUNT];
+
 	std::map<std::pair<void *,DWORD >, MemStream *> m_sCommandRecordMemStreamMap;
 
 	std::mutex m_sMutex;
 
 
+	int m_curRecordMemMapIdx;
 	bool m_isRecording;
 	std::mutex m_recordMutex;
 };

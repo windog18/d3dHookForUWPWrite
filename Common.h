@@ -75,7 +75,13 @@ GlobalGathering::GetInstance()->GetOrCreateMemStreamForPtr(ptr); \
 
 inline void ResetRecordState()
 {
-	ResourceTempData<DWORD,void *>::Reset();
+	///ugly way to do so,try to optimize me!!
+	ResourceTempData<std::pair<ID3D12Resource *, UINT>,void *>::Reset();
+	ResourceTempData<UINT64, ID3D12DescriptorHeap*, 0>::Reset();
+	ResourceTempData<UINT64, ID3D12DescriptorHeap*, 1>::Reset();
+	ResourceTempData<UINT64, ID3D12Resource*>::Reset();
+
+
 	GlobalGathering::GetInstance()->ResetRecordState();
 }
 

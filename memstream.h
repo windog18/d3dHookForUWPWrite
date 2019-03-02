@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "xdefine.h"
 #include <sstream>
-
+#include <mutex>
 
 
 
@@ -27,7 +27,10 @@ private:
 	stringstream nameListCache;
 
 public:
+	std::mutex m_gMutex;
 
+
+public:
 	MemStream();
 	~MemStream();
 	void init();
@@ -58,8 +61,19 @@ public:
 
 	void write(const D3D12_STREAM_OUTPUT_DESC& desc);
 
+	void write(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc);
+
+	void write(const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc);
+
+	void write(const D3D12_COMMAND_SIGNATURE_DESC& desc);
+
+	void write(D3D12_CPU_DESCRIPTOR_HANDLE& handle, ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE typ);
+
+	//void read(D3D12_CPU_DESCRIPTOR_HANDLE& handle, ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE typ);
 
 	void read(D3D12_STREAM_OUTPUT_DESC& desc);
+
+	void read(D3D12_COMMAND_SIGNATURE_DESC& desc);
 
 	template <typename T>
 	inline void read(T &el);
@@ -79,10 +93,15 @@ public:
 	
 
 	inline void WriteToMemStream(const void *src, size_t tSize) {
+		std::lock_guard<std::mutex> locker(m_gMutex);
 		if (tSize + streamcount >= memhandle.size()) {
-			int increSize = memhandle.size() * 2;
+			size_t increSize = memhandle.size() * 2;
 			if (tSize > memhandle.size()) {
-				increSize = 2 * tSize;
+				increSize = (size_t)(1.5 * tSize);
+			}
+			if (increSize > 1024 * 1024 * 1024) {
+				Log_Detail_1(Enum_other1, "writeBuffer: %d, bufferSize: %d", streamcount + tSize, memhandle.size());
+				Log_Detail_1(Enum_other1, "incre large memory: %.2f", (1.5 * tSize) / (1024 * 1024 * 1024));
 			}
 			memhandle.resize(increSize);
 			streamhandle = &memhandle[streamcount];
@@ -90,6 +109,7 @@ public:
 		memcpy(streamhandle, src, tSize);
 		streamcount += tSize;
 		streamhandle += tSize;
+
 	}
 };
 
