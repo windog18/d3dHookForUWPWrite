@@ -354,6 +354,8 @@ inline const char *enum_to_string(CommandEnum t) {
 		return "Resource_GetGPUVirtualAddress";
 	case end_frame:
 		return "end_frame";
+	case end_File:
+		return "end_File";
 
 	case forcedw:
 		break;

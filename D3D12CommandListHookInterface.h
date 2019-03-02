@@ -449,6 +449,8 @@ DECLARE_FUNCTIONPTR(void, D3D12ExecuteBundle, ID3D12GraphicsCommandList *dComman
 	RecordStart
 	MemStream *streamInstance = GetStreamFromThreadID();
 	streamInstance->write(CommandEnum::CommandList_ExecuteBundle);
+	streamInstance->write(dCommandList);
+	streamInstance->write(pCommandList);
 	RecordEnd
 
 	return;
@@ -463,7 +465,7 @@ DECLARE_FUNCTIONPTR(void, D3D12SetDescriptorHeaps, ID3D12GraphicsCommandList *dC
 	streamInstance->write(CommandEnum::CommandList_SetDescriptorHeaps);
 	streamInstance->write(dCommandList);
 	streamInstance->write(NumDescriptorHeaps);
-	streamInstance->write(ppDescriptorHeaps);
+	streamInstance->write(ppDescriptorHeaps, NumDescriptorHeaps * sizeof(ID3D12DescriptorHeap *));
 	RecordEnd
 	return;
 }

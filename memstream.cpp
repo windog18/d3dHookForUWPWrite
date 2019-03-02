@@ -137,20 +137,20 @@ void MemStream::write(D3D12_CPU_DESCRIPTOR_HANDLE& handle, ID3D12Device* device,
 
 	while (heap == NULL && ptr > 0)
 	{
-		if (offset > 100) {
+		if (offset > 50) {
 			break;
 		}
 		ptr -= offsetsize;
 		offset++;
-		heap = ResourceTempData<UINT64, ID3D12DescriptorHeap *, 0>::GetTempMapData(handle.ptr); //XD3D12DescriptorHeap::m_handlemap1[ptr];
+		heap = ResourceTempData<UINT64, ID3D12DescriptorHeap *, 0>::GetTempMapData(ptr); //XD3D12DescriptorHeap::m_handlemap1[ptr];
 	}
 
 	if (heap == NULL) {
 		offset = 0;
-		Log_Detail_1(Enum_other1, "not found desc Heap");
+		//Log_Detail_1(Enum_other1, "not found desc Heap");
 	}
 	else {
-		Log_Detail_1(Enum_other1, "found desc Heap %d",heap);
+		Log_Detail_1(Enum_other1, "found desc Heap %d-------------------------------------------",heap);
 	}
 
 	write(heap);

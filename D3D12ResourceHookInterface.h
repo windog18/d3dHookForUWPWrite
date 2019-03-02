@@ -73,9 +73,9 @@ DECLARE_FUNCTIONPTR(HRESULT, D3D12ResourceMap, ID3D12Resource *dResource, UINT s
 	RecordStart
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Resource_Map);
- 	//streaminstance->write(dResource);
+	streaminstance->write(dResource);
  	streaminstance->write(subresource);
- 	//streaminstance->writePointerValue(pReadRange);
+ 	streaminstance->writePointerValue(pReadRange);
 	RecordEnd
 	return result;
 }
@@ -223,19 +223,19 @@ void CreateHookD3D12ResourceInterface(uint64_t* methodVirtualTable)
 	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[150 + 16], D3D12GetCPUDescriptorHandleForHeapStart);
 	CREATE_HOOKPAIR((LPVOID)methodVirtualTable[150 + 17], D3D12GetGPUDescriptorHandleForHeapStart);
 
-//	MH_EnableHook((LPVOID)methodVirtualTable[150 +  0]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 +  4]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 +  5]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 +  6]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 +  7]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 +  0]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 +  4]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 +  5]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 +  6]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 +  7]);
  	MH_EnableHook((LPVOID)methodVirtualTable[150 +  8]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 +  9]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 +  9]);
 	//MH_EnableHook((LPVOID)methodVirtualTable[150 + 10]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 + 11]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 + 12]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 + 13]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 + 14]);
-// 
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 + 16]);
-// 	MH_EnableHook((LPVOID)methodVirtualTable[150 + 17]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 + 11]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 + 12]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 + 13]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 + 14]);
+
+	MH_EnableHook((LPVOID)methodVirtualTable[150 + 16]);
+	MH_EnableHook((LPVOID)methodVirtualTable[150 + 17]);
 }

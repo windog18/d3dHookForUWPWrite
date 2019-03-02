@@ -80,6 +80,7 @@ DECLARE_FUNCTIONPTR(void, D3D12ExecuteCommandLists, ID3D12CommandQueue * dComman
 
 long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
+	auto res = oPresent12(pSwapChain, SyncInterval, Flags);
 	//Log_WithThreadID("[d3d12]present be called");
 	if (InitOnce)
 	{
@@ -159,6 +160,7 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		if (!beginRecordState && recordState) {
 			if (count >= 1) {
 				GlobalGathering::GetInstance()->SetFrameTagForAll(last_frame);
+				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
 				GlobalGathering::GetInstance()->WriteAllBufferToResult();
 				//OutputDebugStringA("start write files");
 				ResetRecordState();
@@ -166,6 +168,7 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 				count = 0;
 			}
 			else {
+				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
 				GlobalGathering::GetInstance()->SwitchMemMapIdx(1);
 				count = count + 1;
 			}
@@ -230,7 +233,7 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 	*/
 	//Log("[d3d12]Present called");
 	
-	return oPresent12(pSwapChain, SyncInterval, Flags);
+	return res;
 }
 
 long __stdcall hkCreateDevice12(IUnknown *pAdapter, D3D_FEATURE_LEVEL MinimumFeatureLevel, REFIID riid, void **ppDevice)
@@ -458,8 +461,8 @@ int dx12Thread()
 
  		CreateHookD3D12ResourceInterface(dx12::getMethodsTable());
 // 		
- 		//CreateHookD3D12DeviceInterface(dx12::getMethodsTable());
-		//CreateHookD3D12CommandListInterface(dx12::getMethodsTable());
+ 		CreateHookD3D12DeviceInterface(dx12::getMethodsTable());
+		CreateHookD3D12CommandListInterface(dx12::getMethodsTable());
 
 		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[0], hkD3D12DeviceQueryInterface, (LPVOID*)&oD3D12DeviceQueryInterface);
 		//MH_CreateHook((LPVOID)dx12::getMethodsTable()[8], hkD3D12DeviceCreateCommandQueue, (LPVOID*)&oD3D12DeviceCreateCommandQueue);

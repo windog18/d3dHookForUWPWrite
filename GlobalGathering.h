@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <mutex>
 #include <sstream>
 #include "Logger.h"
