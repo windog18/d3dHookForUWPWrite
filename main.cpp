@@ -159,7 +159,7 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 // 		ToggleRecordState();
 		if (!beginRecordState && recordState) {
 			if (count >= 1) {
-				GlobalGathering::GetInstance()->SetFrameTagForAll(last_frame);
+				GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
 				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
 				GlobalGathering::GetInstance()->WriteAllBufferToResult();
 				//OutputDebugStringA("start write files");
@@ -168,6 +168,7 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 				count = 0;
 			}
 			else {
+				GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
 				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
 				GlobalGathering::GetInstance()->SwitchMemMapIdx(1);
 				count = count + 1;
@@ -293,37 +294,67 @@ LRESULT WINAPI DetourWindowProc(
 // 	static std::once_flag flag;
 // 	std::call_once(flag, []() {Logger::get("DetourWindowProc").information("++ DetourWindowProc called"); });
 // 
- 	ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
-
+	//Log("detourWindow Proc called");
+	if (Msg != 77) {
+		ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
+	}
 	return OriginalWindowProc(hWnd, Msg, wParam, lParam);
 }
 
 
- LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	 //Log_WithThreadID(__FUNCTION__);
-// 	 if (msg != 132 && msg != 32 && msg != 675) {
-// 		 stringstream ss;
-// 		 ss << msg;
-// 		 std::string outputString = "procHandler be called " + ss.str();
-// 		 Log(outputString.c_str());
-// 	 }
+	//Log_WithThreadID(__FUNCTION__);
+// 	if (msg != 132 && msg != 32 && msg != 675 && msg != 77 && msg != 83 && msg != 642 && msg != 641 && msg != 7 && msg != 255 && msg != 581) {
+// 		stringstream ss;
+// 		ss << msg;
+// 		std::string outputString = "procHandler be called " + ss.str();
+// 		Log(outputString.c_str());
+// 	}
 
-	 if (msg == 77) { //F1
-		 ToggleBeginRecordState();
-	 }
+	static bool onceCalled = true;
+	if (onceCalled) {
+		onceCalled = false;
+		auto lptrWndProc = reinterpret_cast<WINPROC>(GetWindowLongPtr(hwnd, GWLP_WNDPROC));
+		Log_Simple("handler: %d", lptrWndProc);
+		if (MH_CreateHook(lptrWndProc, &DetourWindowProc, reinterpret_cast<LPVOID*>(&OriginalWindowProc)) != MH_OK)
+		{
+			Log("Couldn't create hook for GWLP_WNDPROC");
+		}
+
+		if (MH_EnableHook(lptrWndProc) != MH_OK)
+		{
+			Log("Couldn't enable GWLP_WNDPROC hook");
+		}
+		else {
+			Log("hook GWLP_WNDPROC success!!!");
+		}
+	}
+	if (msg == 77) { //F1
+		//Log("record togglled!");
+	 	ToggleBeginRecordState();
+	}
+
+	//// if(msg == 264){ alt + ?
+	////  
+	//// }
+
+	//// if(msg == 33){ mouse click
+	////}
 
 	 switch (msg)
 	 {
 	 case WM_KEYDOWN:
 	 case WM_SYSKEYDOWN:
+		 Log_Simple("windows key pressed! -- 2019-SYL %d", wParam);
+		 break;
 	 case WM_LBUTTONDOWN:
 	 case WM_RBUTTONDOWN:
 	 case WM_MBUTTONDOWN:
 	 case WM_LBUTTONDBLCLK:
 	 case WM_RBUTTONDBLCLK:
 	 case WM_MBUTTONDBLCLK:
-		 Log("windows key pressed! -- 2019-SYL");
+
 		 break;
 	 default:
 		 break;

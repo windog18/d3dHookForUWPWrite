@@ -373,7 +373,8 @@ const UINT *pSrcDescriptorRangeSizes, D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeaps
 
 	for (UINT i = 0; i < NumSrcDescriptorRanges; i++){
 		if (pSrcDescriptorRangeSizes == NULL) {
-			instancestream->write<UINT>(0);
+			UINT zeroVal = 0;
+			instancestream->write(zeroVal);
 		}
 		else {
 			instancestream->write(pSrcDescriptorRangeSizes[i]);
