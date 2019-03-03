@@ -116,9 +116,14 @@ DECLARE_FUNCTIONPTR(void, D3D12ResourceUnmap, ID3D12Resource *dResource, UINT su
 		
 		void *tempPtr = ResourceTempData<std::pair<ID3D12Resource *, UINT>,void *>::GetTempMapData(std::make_pair(dResource, subresource));
 		if (tempPtr == NULL) {
-			buffersize = 0;
+			
+			oD3D12ResourceMap(dResource, subresource, pWrittenRange,&tempPtr);
 			streaminstance->write(buffersize);
-			Log_Detail_0(Enum_other1, "Error! resource map cannot found paired result!");
+			streaminstance->write(tempPtr, buffersize);
+			oD3D12ResourceUnmap(dResource, subresource, pWrittenRange);
+			//buffersize = 0;
+			//streaminstance->write(buffersize);
+			//Log_Detail_0(Enum_other1, "Error! resource map cannot found paired result!");
 		}
 		else {
 			//Log_Detail_0(Enum_other1, "Correct! paired result found! bufferSize: %d", buffersize);
