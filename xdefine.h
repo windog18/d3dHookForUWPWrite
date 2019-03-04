@@ -47,6 +47,9 @@ inline InputNameEnu getInputNameEnu(const char* pname)
 			return InputNameEnu(i);
 		}
 	}
+	OutputDebugStringA("2030, the wrong name is ");
+	OutputDebugStringA(pname);
+	OutputDebugStringA("      \n");
 	return SEM_ERROR;
 };
 
