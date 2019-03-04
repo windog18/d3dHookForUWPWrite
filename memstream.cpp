@@ -180,9 +180,10 @@ void MemStream::write(const D3D12_INPUT_LAYOUT_DESC& desc)
 
 	for (UINT i = 0; i < desc.NumElements; i++)
 	{
-		InputNameEnu inputenu = getInputNameEnu(desc.pInputElementDescs[i].SemanticName);
-
-		write(inputenu);
+		const char* pname = desc.pInputElementDescs[i].SemanticName;
+		size_t lent = strlen(pname);
+		write(lent);
+		write(pname, lent);
 
 		write(desc.pInputElementDescs[i].SemanticIndex);
 		write(desc.pInputElementDescs[i].Format);
