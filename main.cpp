@@ -173,7 +173,8 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 				memStreamInstance->write(end_frame);
 				//GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
 				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
-				GlobalGathering::GetInstance()->SwitchMemMapIdx(1);
+				GlobalGathering::GetInstance()->SetupForLastFrameRecord();
+				//GlobalGathering::GetInstance()->SwitchMemMapIdx(1);
 				count = count + 1;
 			}
 		}

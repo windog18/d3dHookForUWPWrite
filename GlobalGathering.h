@@ -69,6 +69,8 @@ public:
 	MemStream *GetOrCreateMemStreamForPtr(void *ptr);
 
 	void SetFrameTagForAll(CommandEnum Tag);
+
+	void SetupForLastFrameRecord();
 	void SwitchMemMapIdx(int idx);
 
 	inline bool IsRecording() {

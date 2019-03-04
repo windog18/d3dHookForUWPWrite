@@ -159,6 +159,17 @@ void GlobalGathering::SetFrameTagForAll(CommandEnum Tag)
 	}
 }
 
+void GlobalGathering::SetupForLastFrameRecord()
+{
+	std::lock_guard<std::mutex> guard(m_sMutex);
+	auto find_iter = m_sRecordMemStreamMap[m_curRecordMemMapIdx].find(GetCurrentThreadId());
+	if (find_iter != m_sRecordMemStreamMap[m_curRecordMemMapIdx].end()) {
+		m_sRecordMemStreamMap[(m_curRecordMemMapIdx + 1) % MEMMAP_COUNT][GetCurrentThreadId()] = m_sRecordMemStreamMap[m_curRecordMemMapIdx][GetCurrentThreadId()];
+		m_sRecordMemStreamMap[m_curRecordMemMapIdx].erase(find_iter);
+	}
+
+}
+
 void GlobalGathering::SwitchMemMapIdx(int idx)
 {
 	std::lock_guard<std::mutex> guard(m_sMutex);
@@ -175,7 +186,12 @@ void GlobalGathering::WriteAllBufferToResult()
 	for (std::map<DWORD, MemStream *>::iterator it = m_sRecordMemStreamMap[0].begin(); it != m_sRecordMemStreamMap[0].end(); it++)
 	{
 		wstringstream wss;
-		wss << "RecordData_";
+		if (GetCurrentThreadId() == it->first){
+			wss << "LastFrame_RecordData_";
+		}
+		else {
+			wss << "RecordData_";
+		}
 		wss << it->first;
 
 		if (GetCurrentThreadId() == it->first)
@@ -202,12 +218,12 @@ void GlobalGathering::WriteAllBufferToResult()
 
 
 	count = m_sRecordMemStreamMap[1].size();
-	Log_Detail_0(Enum_other1, "total dump last frame files count: %d", count);
+	Log_Detail_0(Enum_other1, "total dump saved count: %d", count);
 	basePath = fs::path(UWP::Current::Storage::GetTemporaryPath()) / L"DUMP";
 	for (std::map<DWORD, MemStream *>::iterator it = m_sRecordMemStreamMap[1].begin(); it != m_sRecordMemStreamMap[1].end(); it++)
 	{
 		wstringstream wss;
-		wss << "LastFrame_RecordData_";
+		wss << "RecordData_";
 		wss << it->first;
 
 		if (GetCurrentThreadId() == it->first)
