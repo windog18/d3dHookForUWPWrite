@@ -209,7 +209,3 @@ inline void MemStream::read(CommandEnum& enu)
 
 }
 
-void WriteStream(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, MemStream* pstream);
-
-
-void ReadStream(D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, MemStream* pstream);

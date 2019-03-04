@@ -180,10 +180,9 @@ void MemStream::write(const D3D12_INPUT_LAYOUT_DESC& desc)
 
 	for (UINT i = 0; i < desc.NumElements; i++)
 	{
-		size_t lent = strlen(desc.pInputElementDescs[i].SemanticName);
+		InputNameEnu inputenu = getInputNameEnu(desc.pInputElementDescs[i].SemanticName);
 
-		write(lent);
-		write((void*)desc.pInputElementDescs[i].SemanticName, lent * sizeof(char));
+		write(inputenu);
 
 		write(desc.pInputElementDescs[i].SemanticIndex);
 		write(desc.pInputElementDescs[i].Format);
@@ -276,18 +275,21 @@ void MemStream::write(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc)
 	write(desc.BlendState);
 
 	size_t psosize = desc.CachedPSO.CachedBlobSizeInBytes;
-
 	write(psosize);
+	if (psosize > 0)
+	{
+		write(desc.CachedPSO.pCachedBlob, psosize);
+	}
 
-	write(desc.CachedPSO.pCachedBlob, psosize);
 
 	write(desc.DepthStencilState);
 
 	size_t codesize = desc.DS.BytecodeLength;
-
 	write(codesize);
-
-	write(desc.DS.pShaderBytecode, codesize);
+	if (codesize > 0)
+	{
+		write(desc.DS.pShaderBytecode, codesize);
+	}
 
 	write(desc.DSVFormat);
 
@@ -295,13 +297,17 @@ void MemStream::write(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc)
 
 	codesize = desc.GS.BytecodeLength;
 	write(codesize);
-
-	write(desc.GS.pShaderBytecode, codesize);
-	codesize = desc.HS.BytecodeLength;
+	if (codesize > 0)
+	{
+		write(desc.GS.pShaderBytecode, codesize);
+	}
 
 	codesize = desc.HS.BytecodeLength;
 	write(codesize);
-	write(desc.HS.pShaderBytecode, codesize);
+	if (codesize > 0)
+	{
+		write(desc.HS.pShaderBytecode, codesize);
+	}
 
 	write(desc.IBStripCutValue);
 
@@ -314,10 +320,11 @@ void MemStream::write(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc)
 	write(desc.PrimitiveTopologyType);
 
 	codesize = desc.PS.BytecodeLength;
-
 	write(codesize);
-
-	write(desc.PS.pShaderBytecode, codesize);
+	if (codesize > 0)
+	{
+		write(desc.PS.pShaderBytecode, codesize);
+	}
 
 	write(desc.RasterizerState);
 
@@ -330,10 +337,11 @@ void MemStream::write(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc)
 	write(desc.StreamOutput);
 
 	codesize = desc.VS.BytecodeLength;
-
 	write(codesize);
-
-	write(desc.VS.pShaderBytecode, codesize);
+	if (codesize > 0)
+	{
+		write(desc.VS.pShaderBytecode, codesize);
+	}
 }
 
 
@@ -365,211 +373,57 @@ void MemStream::read( D3D12_STREAM_OUTPUT_DESC& desc)
 }
 
 
-void WriteStream(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, MemStream* pstream)
-{
-	pstream->write(desc.pRootSignature);
 
-	pstream->write(desc.BlendState);
-
-	size_t psosize = desc.CachedPSO.CachedBlobSizeInBytes;
-	
-	pstream->write(psosize);
-	
-	pstream->write(desc.CachedPSO.pCachedBlob, psosize);
-
-	pstream->write(desc.DepthStencilState);
-
-	size_t codesize = desc.DS.BytecodeLength;
-	
-	pstream->write(codesize);
-
-	pstream->write(desc.DS.pShaderBytecode, codesize);
-
-	pstream->write(desc.DSVFormat);
-
-	pstream->write(desc.Flags);
-
-	codesize = desc.GS.BytecodeLength;
-	pstream->write(codesize);
-
-	pstream->write(desc.GS.pShaderBytecode, codesize);
-	codesize = desc.HS.BytecodeLength;
-
-	codesize = desc.HS.BytecodeLength;
-	pstream->write(codesize);
-	pstream->write(desc.HS.pShaderBytecode, codesize);
-
-	pstream->write(desc.IBStripCutValue);
-
-	pstream->write(desc.InputLayout);
-
-	pstream->write(desc.NodeMask);
-
-	pstream->write(desc.NumRenderTargets);
-
-	pstream->write(desc.PrimitiveTopologyType);
-
-	codesize = desc.PS.BytecodeLength;
-
-	pstream->write(codesize);
-	
-	pstream->write(desc.PS.pShaderBytecode, codesize);
-
-	pstream->write(desc.RasterizerState);
-
-	pstream->write( desc.RTVFormats, 8 * sizeof(DXGI_FORMAT) );
-
-	pstream->write(desc.SampleDesc);
-
-	pstream->write(desc.SampleMask);
-
-	pstream->write(desc.StreamOutput);
-
-	codesize = desc.VS.BytecodeLength;
-	
-	pstream->write(codesize);
-
-	pstream->write(desc.VS.pShaderBytecode, codesize);
-
-	
-}
 
 void MemStream::read(D3D12_INPUT_LAYOUT_DESC& desc)
 {
 	read(desc.NumElements);
 
-	desc.pInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[desc.NumElements];
+
+	LPCSTR *semename = new LPCSTR[desc.NumElements];
+
+	UINT* indexarray = new UINT[desc.NumElements];
+
+	DXGI_FORMAT* formatarray = new DXGI_FORMAT[desc.NumElements];
+
+	UINT* slotarray = new UINT[desc.NumElements];
+
+	UINT* offsetarray = new UINT[desc.NumElements];
+
+	D3D12_INPUT_CLASSIFICATION* classarray = new D3D12_INPUT_CLASSIFICATION[desc.NumElements];
+
+	UINT* ratearray = new UINT[desc.NumElements];
+
+
 
 	for (UINT i = 0; i < desc.NumElements; i++)
 	{
-		size_t lent;
 
-		read(lent);
-		char name[512];
-		read((void*)(name), lent * sizeof(char));
-		name[lent] = 0;
-		//desc.pInputElementDescs[i].SemanticName = name;
+		InputNameEnu inputenu;
+		read(inputenu);
 
-		read(desc.pInputElementDescs[i].SemanticIndex);
-		read(desc.pInputElementDescs[i].Format);
-		read(desc.pInputElementDescs[i].InputSlot);
-		read(desc.pInputElementDescs[i].AlignedByteOffset);
-		read(desc.pInputElementDescs[i].InputSlotClass);
-		read(desc.pInputElementDescs[i].InstanceDataStepRate);
+		semename[i] = sem_name[inputenu];
+		read(indexarray[i]);
+		read(formatarray[i]);
+		read(slotarray[i]);
+		read(offsetarray[i]);
+		read(classarray[i]);
+		read(ratearray[i]);
 	}
+
+	UINT8* descdata = new UINT8[sizeof(D3D12_INPUT_ELEMENT_DESC)*desc.NumElements];
+
+	UINT8* adr = descdata;
+	for (UINT i = 0; i < desc.NumElements; i++)
+	{
+		D3D12_INPUT_ELEMENT_DESC desc = { semename[i],indexarray[i], formatarray[i], slotarray[i], offsetarray[i],
+			classarray[i], ratearray[i] };
+
+		memcpy(adr, &desc, sizeof(D3D12_INPUT_ELEMENT_DESC));
+		adr += sizeof(D3D12_INPUT_ELEMENT_DESC);
+	}
+
+	desc.pInputElementDescs = (const D3D12_INPUT_ELEMENT_DESC*)descdata;
 }
 
-
-
-
-void ReadStream(D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, MemStream* pstream)
-{
-	INT64 pointer;
-	pstream->read(pointer );
-
-	
-	desc.pRootSignature = (ID3D12RootSignature *)pointer;
-	
-	pstream->read(desc.BlendState);
-
-	size_t psosize;
-	pstream->read(psosize);
-	desc.CachedPSO.CachedBlobSizeInBytes = psosize;
-	if (psosize == 0)
-	{
-		desc.CachedPSO.pCachedBlob = NULL;
-	}
-	else
-	{
-		pstream->read(desc.CachedPSO.pCachedBlob, psosize);
-	}
-
-	pstream->read(desc.DepthStencilState);
-
-	size_t codesize;
-
-	pstream->read(codesize);
-	desc.DS.BytecodeLength = codesize;
-	if (codesize == 0)
-	{
-		desc.DS.pShaderBytecode = NULL;
-	}
-	else
-	{
-		pstream->read(desc.DS.pShaderBytecode, codesize);
-	}
-
-	pstream->read(desc.DSVFormat);
-
-	pstream->read(desc.Flags);
-
-	pstream->read(codesize);
-	desc.GS.BytecodeLength = codesize;
-	if (codesize == 0)
-	{
-		desc.GS.pShaderBytecode = NULL;
-	}
-	else
-	{
-		pstream->read(desc.GS.pShaderBytecode, codesize);
-	}
-
-	
-	pstream->read(codesize);
-	desc.HS.BytecodeLength = codesize;
-	if (codesize == 0)
-	{
-		desc.HS.pShaderBytecode = NULL;
-	}
-	else
-	{
-		pstream->read(desc.HS.pShaderBytecode, codesize);
-	}
-	
-
-	pstream->read(desc.IBStripCutValue);
-
-
-	pstream->read(desc.InputLayout);
-
-	
-
-	pstream->read(desc.NodeMask);
-
-	pstream->read(desc.NumRenderTargets);
-
-	pstream->read(desc.PrimitiveTopologyType);
-
-	
-	pstream->read(codesize);
-
-	unsigned char* pcode = new unsigned char[codesize];
-
-	pstream->read(pcode, codesize);
-
-	desc.PS.pShaderBytecode = pcode;
-	desc.PS.BytecodeLength = codesize;
-	
-	pstream->read(desc.RasterizerState);
-
-	pstream->read(desc.RTVFormats, 8 * sizeof(DXGI_FORMAT));
-
-	pstream->read(desc.SampleDesc);
-
-	pstream->read(desc.SampleMask);
-
-	pstream->read(desc.StreamOutput);
-
-	
-	pstream->read(codesize);
-	pcode = new unsigned char[codesize];
-
-	pstream->read(pcode, codesize);
-
-	desc.VS.pShaderBytecode = pcode;
-	desc.VS.BytecodeLength = codesize;
-
-	
-
-}
 

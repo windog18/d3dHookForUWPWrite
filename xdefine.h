@@ -1,5 +1,55 @@
 #pragma once
 
+enum InputNameEnu
+{
+	SEM_BINORMAL = 0,
+	SEM_BLENDINDICES,
+	SEM_BLENDWEIGHT,
+	SEM_COLOR,
+	SEM_NORMAL,
+	SEM_POSITION,
+	SEM_POSITIONT,
+	SEM_PSIZE,
+	SEM_TANGENT,
+	SEM_TEXCOORD,
+	SEM_FOG,
+	SEM_TESSFACTOR,
+	SEM_inputnum,
+	SEM_ERROR,
+	SEM_forcedw = 0xffffffff
+};
+
+
+static const char* sem_name[SEM_inputnum] =
+{
+
+	"BINORMAL",
+	"BLENDINDICES",
+	"BLENDWEIGHT",
+	"COLOR",
+	"NORMAL",
+	"POSITION",
+	"POSITIONT",
+	"PSIZE",
+	"TANGENT",
+	"TEXCOORD",
+	"FOG",
+	"TESSFACTOR"
+};
+
+
+inline InputNameEnu getInputNameEnu(const char* pname)
+{
+	for (int i = 0; i < SEM_inputnum; i++)
+	{
+		if (strncmp(pname, sem_name[i], 128) == 0)
+		{
+			return InputNameEnu(i);
+		}
+	}
+	return SEM_ERROR;
+};
+
 
 enum CommandEnum
 {
