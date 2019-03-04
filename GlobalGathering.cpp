@@ -177,6 +177,11 @@ void GlobalGathering::WriteAllBufferToResult()
 		wstringstream wss;
 		wss << "RecordData_";
 		wss << it->first;
+
+		if (GetCurrentThreadId() == it->first)
+		{
+			wss << "_mainThread";
+		}
 		std::error_code ErrorCode;
 
 		fs::path writePath = basePath / wss.str() / L"recordData.bin";
@@ -204,6 +209,11 @@ void GlobalGathering::WriteAllBufferToResult()
 		wstringstream wss;
 		wss << "LastFrame_RecordData_";
 		wss << it->first;
+
+		if (GetCurrentThreadId() == it->first)
+		{
+			wss << "_mainThread";
+		}
 		std::error_code ErrorCode;
 
 		fs::path writePath = basePath / wss.str() / L"recordData.bin";
