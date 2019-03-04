@@ -120,7 +120,7 @@ DECLARE_FUNCTIONPTR(long, D3D12CreateGraphicsPipelineState, ID3D12Device *dDevic
 	MemStream* streaminstance = GetStreamFromThreadID();
 	streaminstance->write(Device_CreateGraphicsPipelineState);
 	streaminstance->write(dDevice);
-	WriteStream(*pDesc, streaminstance);
+	streaminstance->write(*pDesc);
 	streaminstance->write(riid);
 	streaminstance->write(*ppPipelineState);
 	RecordEnd
