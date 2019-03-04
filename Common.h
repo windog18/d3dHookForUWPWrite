@@ -54,6 +54,15 @@ extern std::mutex g_mutex;
 #define GetStreamFromThreadID() \
 GlobalGathering::GetInstance()->GetOrCreateMemStream(GetCurrentThreadId()); \
 
+#define LockStreamForThreadID(threadID) \
+{                                        \
+auto threadStream = GlobalGathering::GetInstance()->GetOrCreateMemStream(threadID); \
+std::lock_guard<std::mutex> _locker(threadStream->g_mutex);
+
+#define UnLockStreamForThreadID(threadID) \
+}
+
+
 #define GetStreamFromPtr(ptr) \
 GlobalGathering::GetInstance()->GetOrCreateMemStreamForPtr(ptr); \
 

@@ -150,7 +150,7 @@ void MemStream::write(D3D12_CPU_DESCRIPTOR_HANDLE& handle, ID3D12Device* device,
 		//Log_Detail_1(Enum_other1, "not found desc Heap");
 	}
 	else {
-		Log_Detail_1(Enum_other1, "found desc Heap %d-------------------------------------------",heap);
+		//Log_Detail_1(Enum_other1, "found desc Heap %d-------------------------------------------",heap);
 	}
 
 	write(heap);

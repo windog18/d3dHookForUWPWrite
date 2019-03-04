@@ -80,7 +80,6 @@ DECLARE_FUNCTIONPTR(void, D3D12ExecuteCommandLists, ID3D12CommandQueue * dComman
 
 long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	auto res = oPresent12(pSwapChain, SyncInterval, Flags);
 	//Log_WithThreadID("[d3d12]present be called");
 	if (InitOnce)
 	{
@@ -159,7 +158,9 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 // 		ToggleRecordState();
 		if (!beginRecordState && recordState) {
 			if (count >= 1) {
-				GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
+				auto memStreamInstance = GetStreamFromThreadID();
+				memStreamInstance->write(end_frame);
+				//GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
 				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
 				GlobalGathering::GetInstance()->WriteAllBufferToResult();
 				//OutputDebugStringA("start write files");
@@ -168,7 +169,9 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 				count = 0;
 			}
 			else {
-				GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
+				auto memStreamInstance = GetStreamFromThreadID();
+				memStreamInstance->write(end_frame);
+				//GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
 				GlobalGathering::GetInstance()->SetFrameTagForAll(end_File);
 				GlobalGathering::GetInstance()->SwitchMemMapIdx(1);
 				count = count + 1;
@@ -177,7 +180,9 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 		else {
 
 			if (beginRecordState && recordState) {
-				GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
+				auto memStreamInstance = GetStreamFromThreadID();
+				memStreamInstance->write(end_frame);
+				//GlobalGathering::GetInstance()->SetFrameTagForAll(end_frame);
 			}
 
 			GlobalGathering::GetInstance()->SetRecording(beginRecordState);
@@ -234,6 +239,7 @@ long __stdcall hkPresent12(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT F
 	*/
 	//Log("[d3d12]Present called");
 	
+	auto res = oPresent12(pSwapChain, SyncInterval, Flags);
 	return res;
 }
 
